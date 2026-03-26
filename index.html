@@ -4,30 +4,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KhawaChat</title>
 <style>
-body{margin:0;font-family:Arial;background:#0a0a0a;color:white;overflow:hidden}/* LOGO */ .logo{position:fixed;bottom:10px;right:10px;width:35px;opacity:0.5;pointer-events:none}
-
+body{margin:0;font-family:Arial;background:#0a0a0a;color:white;overflow:hidden}
+.logo{position:fixed;bottom:10px;right:10px;width:35px;opacity:0.5;pointer-events:none}
 .container{display:flex;height:100vh}
-
-.sidebar{width:28%;background:#111;padding:12px;overflow:auto;border-right:1px solid #222} .chat{flex:1;display:flex;flex-direction:column} .messages{flex:1;overflow:auto;padding:10px}
-
+.sidebar{width:28%;background:#111;padding:12px;overflow:auto;border-right:1px solid #222}
+.chat{flex:1;display:flex;flex-direction:column}
+.messages{flex:1;overflow:auto;padding:10px}
 input,button,textarea{padding:10px;border:none;border-radius:10px;margin:5px 0}
-
-button{background:#fff;color:#000;cursor:pointer;transition:0.2s} button:hover{transform:scale(1.05);box-shadow:0 0 10px white}
-
-.msg{margin:6px 0;padding:10px;background:#1c1c1c;border-radius:10px;animation:fadeIn 0.3s ease}
-
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-.user{padding:8px;background:#1a1a1a;margin:5px 0;border-radius:8px;cursor:pointer;transition:0.2s} .user:hover{background:#2a2a2a;box-shadow:0 0 8px white}
-
+button{background:#fff;color:#000;cursor:pointer;transition:0.2s}
+button:hover{transform:scale(1.05);box-shadow:0 0 10px white}
+.msg{margin:6px 0;padding:10px;background:#1c1c1c;border-radius:10px;animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+.user{padding:8px;background:#1a1a1a;margin:5px 0;border-radius:8px;cursor:pointer}
 .topbar{padding:10px;background:#111;border-bottom:1px solid #222}
-
 .cooldown{font-size:12px;color:#aaa}
-
 </style>
 </head>
 <body>
-<img src="logo.png" class="logo"><div id="auth">
+<img src="logo.png" class="logo"><div id="authPage">
 <h2>Login / Register</h2>
 <input id="email" placeholder="Email"><br>
 <input id="password" type="password" placeholder="Password"><br>
@@ -40,53 +34,40 @@ button{background:#fff;color:#000;cursor:pointer;transition:0.2s} button:hover{t
 <input id="photo" placeholder="Link foto (opsional)"><br>
 <button onclick="saveProfile()">Simpan</button>
 </div><div id="app" style="display:none">
-<div class="container"><div class="sidebar">
+<div class="container">
+<div class="sidebar">
 <h3>KhawaChat</h3>
 <input id="search" placeholder="Cari seseorang">
 <div id="users"></div>
-<hr>
-<h4>Chat sebelumnya</h4>
-<div id="recent"></div>
-</div><div class="chat">
+</div>
+<div class="chat">
 <div class="topbar" id="chatTitle">Global Chat</div>
 <div class="messages" id="messages"></div>
 <input id="msgInput" placeholder="Ketik pesan...">
 <button onclick="sendMsg()">Kirim</button>
 <div class="cooldown" id="cooldown"></div>
-</div></div>
+</div>
+</div>
 </div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-const firebaseConfig={apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",authDomain:"crowdedparty.firebaseapp.com",projectId:"crowdedparty"};
-
-const app=initializeApp(firebaseConfig);
+const appFirebase=initializeApp({apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",authDomain:"crowdedparty.firebaseapp.com",projectId:"crowdedparty"});
 const auth=getAuth();
 const db=getFirestore();
 
-let currentUser=null;
-let currentChat="global";
-let lastSend=0;
+let currentUser=null,currentChat='global',lastSend=0,messageCount=0;
 
-window.login=async()=>{
-let e=email.value,p=password.value;
-await signInWithEmailAndPassword(auth,e,p);
-}
-
-window.register=async()=>{
-let e=email.value,p=password.value;
-await createUserWithEmailAndPassword(auth,e,p);
-}
+window.login=async()=>{await signInWithEmailAndPassword(auth,email.value,password.value)}
+window.register=async()=>{await createUserWithEmailAndPassword(auth,email.value,password.value)}
 
 onAuthStateChanged(auth,async user=>{
 if(user){
 currentUser=user;
-auth.style.display='none';
+document.getElementById('authPage').style.display='none';
 
-let ref=doc(db,'users',user.uid);
-let snap=await getDoc(ref);
-
+let snap=await getDoc(doc(db,'users',user.uid));
 if(!snap.exists()) profileSetup.style.display='block';
 else{app.style.display='block';init();}
 }
@@ -99,45 +80,26 @@ username:username.value,bio:bio.value,photo:photo.value,rating:0,totalRate:0
 profileSetup.style.display='none';app.style.display='block';init();
 }
 
-function init(){
-loadUsers();
-loadMessages();
-}
+function init(){loadUsers();loadMessages();}
 
 async function loadUsers(){
 let snap=await getDocs(collection(db,'users'));
 let html='';
 snap.forEach(u=>{
 let d=u.data();
-html+=`<div class='user' onclick="openChat('${u.id}','${d.username}')">${d.username}</div>`;
+html+=`<div class='user' onclick="openChat('${u.id}','${d.username}')">${d.username} ⭐${d.rating||0}</div>`;
 });
 users.innerHTML=html;
 }
 
-window.openChat=(uid,name)=>{
-currentChat=uid;
-chatTitle.innerText=name;
-loadMessages();
-}
+window.openChat=(uid,name)=>{currentChat=uid;chatTitle.innerText=name;loadMessages();}
 
 window.sendMsg=async()=>{
 let now=Date.now();
-
-if(currentChat==='global'){
-if(now-lastSend<12000){
-cooldown.innerText='Tunggu '+Math.ceil((12000-(now-lastSend))/1000)+' detik';
-return;
-}
-}
-
-lastSend=now;
-
-await addDoc(collection(db,'messages'),{
-text:msgInput.value,
-uid:currentUser.uid,
-to:currentChat,
-time:now
-});
+if(currentChat==='global' && now-lastSend<12000){
+cooldown.innerText='Cooldown '+Math.ceil((12000-(now-lastSend))/1000)+'s';return;}
+lastSend=now;messageCount++;
+await addDoc(collection(db,'messages'),{text:msgInput.value,uid:currentUser.uid,to:currentChat,time:now});
 msgInput.value='';
 }
 
@@ -147,22 +109,27 @@ onSnapshot(q,snap=>{
 let html='';
 snap.forEach(d=>{
 let data=d.data();
-
-if(currentChat==='global' && data.to==='global'){
-html+=`<div class='msg'>${data.text}</div>`;
-}
-
+if(currentChat==='global' && data.to==='global') html+=`<div class='msg'>${data.text}</div>`;
 if(currentChat!=='global'){
-if((data.uid===currentUser.uid && data.to===currentChat) ||
-(data.uid===currentChat && data.to===currentUser.uid)){
-html+=`<div class='msg'>${data.text}</div>`;
+if((data.uid===currentUser.uid && data.to===currentChat)||(data.uid===currentChat && data.to===currentUser.uid)) html+=`<div class='msg'>${data.text}</div>`;
 }
+});
+messages.innerHTML=html;messages.scrollTop=messages.scrollHeight;
+});
 }
 
-});
-messages.innerHTML=html;
-messages.scrollTop=messages.scrollHeight;
-});
+// RATING SYSTEM
+window.rateUser=async(uid,stars)=>{
+if(messageCount<20){alert('Minimal 20 chat dulu');return;}
+let ref=doc(db,'users',uid);
+let snap=await getDoc(ref);
+let d=snap.data();
+let total=d.totalRate||0;
+let rating=d.rating||0;
+let newTotal=total+1;
+let newRating=((rating*total)+stars)/newTotal;
+await updateDoc(ref,{rating:newRating,totalRate:newTotal});
+alert('Rated!');
 }
 </script></body>
 </html>
