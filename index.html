@@ -2,10 +2,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhawaChat Ultimate</title>
+<title>KhawaChat FIX FINAL</title>
 <style>
 body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
-.logo{position:fixed;bottom:10px;right:10px;width:35px;opacity:0.5;pointer-events:none}
 .container{display:flex;height:100vh}
 .sidebar{width:30%;background:#111;padding:10px;overflow:auto}
 .chat{flex:1;display:flex;flex-direction:column}
@@ -15,179 +14,128 @@ button{background:white;color:black;cursor:pointer}
 .msgRow{display:flex;margin:5px 0}
 .msgRow.me{justify-content:flex-end}
 .msgRow.other{justify-content:flex-start}
-.msg{max-width:60%;padding:10px;border-radius:10px}
+.msg{padding:10px;border-radius:10px;max-width:60%}
 .me .msg{background:white;color:black}
-.other .msg{background:#222;color:white}
-.avatar{width:25px;height:25px;border-radius:50%;margin:0 5px}
+.other .msg{background:#222}
+.avatar{width:25px;height:25px;border-radius:50%;margin:0 5px;cursor:pointer}
 .user{background:#1a1a1a;padding:8px;margin:5px;border-radius:8px;cursor:pointer}
-.star{cursor:pointer;color:gold}
+.delete{font-size:10px;color:red;cursor:pointer}
 </style>
 </head>
-<body>
-<img src="logo.png" class="logo"><div id="authPage">
+<body><div id="authPage">
 <h2>Login</h2>
-<input id="email" placeholder="Email"><br>
-<input id="password" type="password" placeholder="Password"><br>
+<input id="email"><br>
+<input id="password" type="password"><br>
 <button onclick="login()">Login</button>
 <button onclick="register()">Register</button>
 </div><div id="profileSetup" style="display:none">
 <h2>Profile</h2>
 <input id="username" placeholder="Username"><br>
-<input id="bio" placeholder="Bio"><br>
 <input type="file" id="photoFile"><br>
 <button onclick="saveProfile()">Save</button>
 </div><div id="app" style="display:none">
 <div class="container">
 <div class="sidebar">
-<button onclick="editProfile()">Edit Profile</button>
-<hr>
+<h3>Users</h3>
 <div id="users"></div>
 </div>
 <div class="chat">
 <div id="messages" class="messages"></div>
-<input id="msgInput" placeholder="Ketik pesan">
+<input id="msgInput">
 <button onclick="sendMsg()">Send</button>
 </div>
 </div>
+</div><div id="profilePopup" style="display:none;position:fixed;top:20%;left:50%;transform:translateX(-50%);background:#111;padding:20px;border-radius:10px">
+<h3 id="pName"></h3>
+<img id="pImg" width="80"><br>
+<button onclick="closeProfile()">Close</button>
 </div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-const app = initializeApp({apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",authDomain:"crowdedparty.firebaseapp.com",projectId:"crowdedparty"});
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app=initializeApp({apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",authDomain:"crowdedparty.firebaseapp.com",projectId:"crowdedparty"});
+const auth=getAuth();
+const db=getFirestore();
 
-let userNow=null,currentChat="global",userCache={},msgCount=0,lastSend=0;
+let me=null,chat='global',usersCache={};
 
-window.login=async()=>{await signInWithEmailAndPassword(auth,email.value,password.value)}
-window.register=async()=>{await createUserWithEmailAndPassword(auth,email.value,password.value)}
+window.login=()=>signInWithEmailAndPassword(auth,email.value,password.value);
+window.register=()=>createUserWithEmailAndPassword(auth,email.value,password.value);
 
-onAuthStateChanged(auth, async(user)=>{
-if(user){
-userNow=user;
+onAuthStateChanged(auth,async u=>{
+if(!u) return;
+me=u;
 authPage.style.display='none';
-let snap=await getDoc(doc(db,'users',user.uid));
+let snap=await getDoc(doc(db,'users',u.uid));
 if(!snap.exists()) profileSetup.style.display='block';
-else{app.style.display='block';startApp();}
-}
+else{app.style.display='block';init();}
 });
 
-function fileToBase64(file){
-return new Promise((res)=>{
-let reader=new FileReader();
-reader.onload=()=>res(reader.result);
-reader.readAsDataURL(file);
-});
-}
+function fileToBase64(f){return new Promise(r=>{let rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(f);});}
 
 window.saveProfile=async()=>{
 let file=photoFile.files[0];
-let photo="";
-if(file) photo=await fileToBase64(file);
-
-await setDoc(doc(db,'users',userNow.uid),{
-username:username.value,
-bio:bio.value,
-photo:photo,
-rating:0,totalRate:0
-});
-profileSetup.style.display='none';app.style.display='block';startApp();
+let photo=file?await fileToBase64(file):"";
+await setDoc(doc(db,'users',me.uid),{username:username.value,photo:photo});
+profileSetup.style.display='none';app.style.display='block';init();
 }
 
-window.editProfile=async()=>{
-let snap=await getDoc(doc(db,'users',userNow.uid));
-let d=snap.data();
-
-let name=prompt('Username',d.username);
-let bioo=prompt('Bio',d.bio);
-
-await updateDoc(doc(db,'users',userNow.uid),{username:name,bio:bioo});
-alert('Updated');
-loadUsers();
-}
-
-async function startApp(){await loadUsers();loadMessages();}
+async function init(){await loadUsers();loadMsgs();}
 
 async function loadUsers(){
 let snap=await getDocs(collection(db,'users'));
-let html="";userCache={};
-
-snap.forEach(u=>{
-let d=u.data();
-userCache[u.id]=d;
-html+=`<div class='user' onclick="openChat('${u.id}')">${d.username} ⭐${(d.rating||0).toFixed(1)}</div>`;
-});
+let html="";usersCache={};
+snap.forEach(d=>{usersCache[d.id]=d.data();html+=`<div class='user' onclick="openChat('${d.id}')">${d.data().username}</div>`});
 users.innerHTML=html;
 }
 
-window.openChat=(uid)=>{currentChat=uid;loadMessages();}
+window.openChat=id=>{chat=id;loadMsgs();}
 
 window.sendMsg=async()=>{
-let now=Date.now();
-if(currentChat==='global' && now-lastSend<12000){alert('Cooldown');return}
-lastSend=now;msgCount++;
-
-await addDoc(collection(db,'messages'),{
-text:msgInput.value,
-uid:userNow.uid,
-to:currentChat,
-time:now
-});
+if(!msgInput.value) return;
+await addDoc(collection(db,'messages'),{text:msgInput.value,uid:me.uid,to:chat,time:Date.now()});
 msgInput.value="";
 }
 
-function loadMessages(){
-onSnapshot(collection(db,'messages'),(snap)=>{
-let arr=[];snap.forEach(d=>arr.push(d.data()));
+function loadMsgs(){
+onSnapshot(collection(db,'messages'),snap=>{
+let arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));
 arr.sort((a,b)=>a.time-b.time);
-
 let html="";
-arr.forEach(data=>{
-if(!userCache[data.uid]) return;
+arr.forEach(m=>{
+if(!usersCache[m.uid]) return;
+if(chat==='global' && m.to!=='global') return;
+if(chat!=='global' && !(m.uid===me.uid&&m.to===chat||m.uid===chat&&m.to===me.uid)) return;
 
-let isMe=data.uid===userNow.uid;
-let user=userCache[data.uid];
+let isMe=m.uid===me.uid;
+let user=usersCache[m.uid];
 let photo=user.photo||"https://i.imgur.com/HeIi0wU.png";
 
-if(currentChat==='global' && data.to==='global') html+=renderMsg(data.text,isMe,photo,data.uid);
-
-if(currentChat!=='global'){
-if((data.uid===userNow.uid&&data.to===currentChat)||(data.uid===currentChat&&data.to===userNow.uid)){
-html+=renderMsg(data.text,isMe,photo,data.uid);
-}
-}
+html+=`<div class='msgRow ${isMe?'me':'other'}'>
+${!isMe?`<img src='${photo}' class='avatar' onclick="showProfile('${m.uid}')">`:''}
+<div>
+<div class='msg'>${m.text}</div>
+${isMe?`<div class='delete' onclick="delMsg('${m.id}')">hapus</div>`:''}
+</div>
+${isMe?`<img src='${photo}' class='avatar' onclick="showProfile('${m.uid}')">`:''}
+</div>`;
 });
-
 messages.innerHTML=html;
 messages.scrollTop=messages.scrollHeight;
 });
 }
 
-function renderMsg(text,isMe,photo,uid){
-let rateBtn="";
-if(!isMe && msgCount>=20){
-rateBtn=`<div>${[1,2,3,4,5].map(s=>`<span class='star' onclick='rateUser("${uid}",${s})'>★</span>`).join('')}</div>`;
+window.delMsg=id=>deleteDoc(doc(db,'messages',id));
+
+window.showProfile=id=>{
+let u=usersCache[id];
+pName.innerText=u.username;
+pImg.src=u.photo||"https://i.imgur.com/HeIi0wU.png";
+profilePopup.style.display='block';
 }
 
-if(isMe){
-return `<div class='msgRow me'><div><div class='msg'>${text}</div></div><img class='avatar' src='${photo}'></div>`;
-}else{
-return `<div class='msgRow other'><img class='avatar' src='${photo}'><div><div class='msg'>${text}</div>${rateBtn}</div></div>`;
-}
-}
+window.closeProfile=()=>profilePopup.style.display='none';
 
-window.rateUser=async(uid,stars)=>{
-if(msgCount<20){alert('Minimal 20 chat');return}
-let ref=doc(db,'users',uid);
-let snap=await getDoc(ref);
-let d=snap.data();
-let total=d.totalRate||0;
-let rating=d.rating||0;
-let newTotal=total+1;
-let newRating=((rating*total)+stars)/newTotal;
-await updateDoc(ref,{rating:newRating,totalRate:newTotal});
-alert('Rated!');
-}
 </script></body>
 </html>
