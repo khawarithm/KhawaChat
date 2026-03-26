@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhawaChat FIX FINAL</title>
+<title>KhawaChat</title>
 <style>
 body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
 .container{display:flex;height:100vh}
@@ -37,11 +37,12 @@ button{background:white;color:black;cursor:pointer}
 <div class="container">
 <div class="sidebar">
 <h3>Users</h3>
+<button onclick="editProfile()">Edit Profile</button>
 <div id="users"></div>
 </div>
 <div class="chat">
 <div id="messages" class="messages"></div>
-<input id="msgInput">
+<input id="msgInput" placeholder="Ketik pesan">
 <button onclick="sendMsg()">Send</button>
 </div>
 </div>
@@ -52,13 +53,19 @@ button{background:white;color:black;cursor:pointer}
 </div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-const app=initializeApp({apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",authDomain:"crowdedparty.firebaseapp.com",projectId:"crowdedparty"});
-const auth=getAuth();
-const db=getFirestore();
+const firebaseConfig = {
+apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
+authDomain:"crowdedparty.firebaseapp.com",
+projectId:"crowdedparty"
+};
 
-let me=null,chat='global',usersCache={};
+const appFirebase = initializeApp(firebaseConfig);
+const auth = getAuth(appFirebase);
+const db = getFirestore(appFirebase);
+
+let me=null,chat='global',usersCache={},lastSend=0;
 
 window.login=()=>signInWithEmailAndPassword(auth,email.value,password.value);
 window.register=()=>createUserWithEmailAndPassword(auth,email.value,password.value);
@@ -81,6 +88,14 @@ await setDoc(doc(db,'users',me.uid),{username:username.value,photo:photo});
 profileSetup.style.display='none';app.style.display='block';init();
 }
 
+window.editProfile=async()=>{
+let snap=await getDoc(doc(db,'users',me.uid));
+let d=snap.data();
+let name=prompt('Username',d.username);
+await updateDoc(doc(db,'users',me.uid),{username:name});
+loadUsers();
+}
+
 async function init(){await loadUsers();loadMsgs();}
 
 async function loadUsers(){
@@ -94,7 +109,10 @@ window.openChat=id=>{chat=id;loadMsgs();}
 
 window.sendMsg=async()=>{
 if(!msgInput.value) return;
-await addDoc(collection(db,'messages'),{text:msgInput.value,uid:me.uid,to:chat,time:Date.now()});
+let now=Date.now();
+if(chat==='global' && now-lastSend<12000){alert('Cooldown 12 detik');return}
+lastSend=now;
+await addDoc(collection(db,'messages'),{text:msgInput.value,uid:me.uid,to:chat,time:now});
 msgInput.value="";
 }
 
