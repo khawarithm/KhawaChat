@@ -9,17 +9,19 @@ body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
 .container{display:flex;height:100vh}
 .sidebar{width:30%;background:#111;padding:10px;overflow:auto}
 .chat{flex:1;display:flex;flex-direction:column}
-.messages{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column}input,button{padding:10px;border:none;border-radius:8px;margin:5px 0} button{background:white;color:black}
+.messages{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column}input,button{padding:10px;border:none;border-radius:8px;margin:5px 0} button{background:white;color:black;cursor:pointer}
 
-.msgRow{display:flex;align-items:flex-end;margin:5px 0} .msgRow.me{justify-content:flex-end} .msgRow.other{justify-content:flex-start}
+.msgRow{display:flex;align-items:flex-end;margin:5px 0;animation:fadeIn 0.2s} .msgRow.me{justify-content:flex-end} .msgRow.other{justify-content:flex-start}
 
-.msg{ max-width:60%; padding:10px; border-radius:10px; }
+.msg{max-width:60%;padding:10px;border-radius:10px} .me .msg{background:white;color:black} .other .msg{background:#222;color:white}
 
-.me .msg{background:white;color:black} .other .msg{background:#222;color:white}
+.avatar{width:25px;height:25px;border-radius:50%;margin:0 5px}
 
-.avatar{ width:25px; height:25px; border-radius:50%; margin:0 5px; }
+.username{font-size:12px;color:#aaa;margin-bottom:2px}
 
-.user{background:#1a1a1a;padding:8px;margin:5px;border-radius:8px;cursor:pointer} </style>
+.user{background:#1a1a1a;padding:8px;margin:5px;border-radius:8px;cursor:pointer}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1}} </style>
 
 </head>
 <body>
@@ -33,12 +35,14 @@ body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
 <h2>Profile</h2>
 <input id="username" placeholder="Username"><br>
 <input id="bio" placeholder="Bio"><br>
-<input id="photo" placeholder="Link foto (opsional)"><br>
+<input id="photo" placeholder="Link foto"><br>
 <button onclick="saveProfile()">Save</button>
 </div><div id="app" style="display:none">
 <div class="container">
 <div class="sidebar">
-<h3>User</h3>
+<h3>Profile</h3>
+<button onclick="editProfile()">Edit Profile</button>
+<hr>
 <div id="users"></div>
 </div>
 <div class="chat">
@@ -50,124 +54,99 @@ body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
 </div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-const app = initializeApp({
-apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
-authDomain:"crowdedparty.firebaseapp.com",
-projectId:"crowdedparty"
-});
-
+const app = initializeApp({apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",authDomain:"crowdedparty.firebaseapp.com",projectId:"crowdedparty"});
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let userNow = null;
-let currentChat = "global";
-let userCache = {};
+let userNow=null,currentChat="global",userCache={};
 
-window.login = async ()=>{
-await signInWithEmailAndPassword(auth,email.value,password.value);
-}
+window.login=async()=>{await signInWithEmailAndPassword(auth,email.value,password.value)}
+window.register=async()=>{await createUserWithEmailAndPassword(auth,email.value,password.value)}
 
-window.register = async ()=>{
-await createUserWithEmailAndPassword(auth,email.value,password.value);
-}
-
-onAuthStateChanged(auth, async (user)=>{
+onAuthStateChanged(auth,async(user)=>{
 if(user){
-userNow = user;
-document.getElementById("authPage").style.display="none";
-
-let snap = await getDoc(doc(db,"users",user.uid));
-if(!snap.exists()){
-document.getElementById("profileSetup").style.display="block";
-}else{
-document.getElementById("app").style.display="block";
-startApp();
-}
+userNow=user;
+authPage.style.display='none';
+let snap=await getDoc(doc(db,'users',user.uid));
+if(!snap.exists()) profileSetup.style.display='block';
+else{app.style.display='block';startApp();}
 }
 });
 
-window.saveProfile = async ()=>{
-await setDoc(doc(db,"users",userNow.uid),{
-username:username.value,
-bio:bio.value,
-photo:photo.value
+window.saveProfile=async()=>{
+await setDoc(doc(db,'users',userNow.uid),{
+username:username.value,bio:bio.value,photo:photo.value
 });
-
-document.getElementById("profileSetup").style.display="none";
-document.getElementById("app").style.display="block";
-startApp();
+profileSetup.style.display='none';app.style.display='block';startApp();
 }
 
-async function startApp(){
-await loadUsers();
-loadMessages();
+window.editProfile=async()=>{
+let snap=await getDoc(doc(db,'users',userNow.uid));
+let d=snap.data();
+let newName=prompt('Username',d.username);
+let newBio=prompt('Bio',d.bio);
+let newPhoto=prompt('Photo URL',d.photo);
+await updateDoc(doc(db,'users',userNow.uid),{username:newName,bio:newBio,photo:newPhoto});
+alert('Updated!');
+loadUsers();
 }
+
+async function startApp(){await loadUsers();loadMessages();}
 
 async function loadUsers(){
-let snap = await getDocs(collection(db,"users"));
-let html="";
+let snap=await getDocs(collection(db,'users'));
+let html='';
 snap.forEach(u=>{
-userCache[u.id] = u.data();
-html += `<div class='user' onclick="openChat('${u.id}')">${u.data().username}</div>`;
+userCache[u.id]=u.data();
+html+=`<div class='user' onclick="openChat('${u.id}')">${u.data().username}</div>`;
 });
-users.innerHTML = html;
+users.innerHTML=html;
 }
 
-window.openChat = (uid)=>{
-currentChat = uid;
-loadMessages();
-}
+window.openChat=(uid)=>{currentChat=uid;loadMessages();}
 
-window.sendMsg = async ()=>{
-await addDoc(collection(db,"messages"),{
-text: msgInput.value,
-uid: userNow.uid,
-to: currentChat,
-time: Date.now()
-});
-msgInput.value="";
+window.sendMsg=async()=>{
+if(!msgInput.value) return;
+await addDoc(collection(db,'messages'),{text:msgInput.value,uid:userNow.uid,to:currentChat,time:Date.now()});
+msgInput.value='';
 }
 
 function loadMessages(){
-onSnapshot(collection(db,"messages"),(snap)=>{
-let html="";
-snap.forEach(d=>{
-let data = d.data();
+onSnapshot(collection(db,'messages'),(snap)=>{
+let arr=[];
+snap.forEach(d=>arr.push(d.data()));
+arr.sort((a,b)=>a.time-b.time);
 
-let isMe = data.uid === userNow.uid;
-let user = userCache[data.uid] || {};
-let photo = user.photo || "https://i.imgur.com/HeIi0wU.png";
+let html='';
+arr.forEach(data=>{
+let isMe=data.uid===userNow.uid;
+let user=userCache[data.uid]||{};
+let photo=user.photo||"https://i.imgur.com/HeIi0wU.png";
+let name=user.username||"User";
 
-if(currentChat==="global" && data.to==="global"){
-html += renderMsg(data.text, isMe, photo);
+if(currentChat==='global' && data.to==='global'){
+html+=renderMsg(data.text,isMe,photo,name);
 }
 
-if(currentChat!=="global"){
-if((data.uid===userNow.uid && data.to===currentChat) || (data.uid===currentChat && data.to===userNow.uid)){
-html += renderMsg(data.text, isMe, photo);
+if(currentChat!=='global'){
+if((data.uid===userNow.uid&&data.to===currentChat)||(data.uid===currentChat&&data.to===userNow.uid)){
+html+=renderMsg(data.text,isMe,photo,name);
 }
 }
 });
-messages.innerHTML = html;
-messages.scrollTop = messages.scrollHeight;
+
+messages.innerHTML=html;
+messages.scrollTop=messages.scrollHeight;
 });
 }
 
-function renderMsg(text, isMe, photo){
+function renderMsg(text,isMe,photo,name){
 if(isMe){
-return `
-<div class="msgRow me">
-  <div class="msg">${text}</div>
-  <img class="avatar" src="${photo}">
-</div>`;
+return `<div class="msgRow me"><div><div class="username">${name}</div><div class="msg">${text}</div></div><img class="avatar" src="${photo}"></div>`;
 }else{
-return `
-<div class="msgRow other">
-  <img class="avatar" src="${photo}">
-  <div class="msg">${text}</div>
-</div>`;
+return `<div class="msgRow other"><img class="avatar" src="${photo}"><div><div class="username">${name}</div><div class="msg">${text}</div></div></div>`;
 }
 }
 </script></body>
