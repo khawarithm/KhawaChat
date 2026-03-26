@@ -17,24 +17,32 @@ body{
 
 .messages{ flex:1; overflow:auto; padding:10px; }
 
-input,button{ padding:10px; border:none; border-radius:8px; margin:5px 0; }
+input,button,textarea{ padding:10px; border:none; border-radius:8px; margin:5px 0; }
 
 button{ background:white; cursor:pointer; }
 
 .msg{ margin:5px 0; padding:8px; background:#222; border-radius:8px; }
 
-.logo{ position:fixed; top:10px; left:10px; width:40px; }
+/* FIX LOGO BIAR GA NGGANGGU */ .logo{ position:fixed; bottom:10px; right:10px; width:35px; opacity:0.6; pointer-events:none; }
+
+.glow{ box-shadow:0 0 10px white; }
 
 </style>
 </head>
 <body>
-<img src="logo.png" class="logo"><div id="auth">
+<img src="logo.png" class="logo"><!-- AUTH --><div id="auth">
   <h2>Login / Register</h2>
   <input id="email" placeholder="Email"><br>
   <input id="password" type="password" placeholder="Password"><br>
   <button onclick="login()">Login</button>
   <button onclick="register()">Register</button>
-</div><div id="app" style="display:none">
+</div><!-- PROFILE SETUP --><div id="profileSetup" style="display:none">
+  <h2>Lengkapi Profile</h2>
+  <input id="username" placeholder="Username"><br>
+  <textarea id="bio" placeholder="Bio"></textarea><br>
+  <input id="photo" placeholder="Link foto (opsional)"><br>
+  <button onclick="saveProfile()">Simpan</button>
+</div><!-- MAIN APP --><div id="app" style="display:none">
   <div class="container">
     <div class="sidebar">
       <h3>Cari seseorang</h3>
@@ -50,7 +58,7 @@ button{ background:white; cursor:pointer; }
 </div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
@@ -61,6 +69,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
+
+let currentUser = null;
 
 window.login = async ()=>{
   let email = document.getElementById('email').value;
@@ -74,18 +84,47 @@ window.register = async ()=>{
   await createUserWithEmailAndPassword(auth,email,pass);
 }
 
-onAuthStateChanged(auth,user=>{
+onAuthStateChanged(auth, async user=>{
   if(user){
+    currentUser = user;
     document.getElementById('auth').style.display='none';
-    document.getElementById('app').style.display='block';
-    loadMessages();
+
+    // CEK PROFILE
+    const ref = doc(db,'users',user.uid);
+    const snap = await getDoc(ref);
+
+    if(!snap.exists()){
+      document.getElementById('profileSetup').style.display='block';
+    }else{
+      document.getElementById('app').style.display='block';
+      loadMessages();
+    }
   }
 });
+
+window.saveProfile = async ()=>{
+  let username = document.getElementById('username').value;
+  let bio = document.getElementById('bio').value;
+  let photo = document.getElementById('photo').value;
+
+  await setDoc(doc(db,'users',currentUser.uid),{
+    username:username,
+    bio:bio,
+    photo:photo,
+    rating:0,
+    totalRate:0
+  });
+
+  document.getElementById('profileSetup').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadMessages();
+}
 
 async function sendMsg(){
   let text = document.getElementById('msgInput').value;
   await addDoc(collection(db,'messages'),{
     text:text,
+    uid:currentUser.uid,
     time:Date.now()
   });
 }
