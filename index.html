@@ -1,0 +1,104 @@
+<!DOCTYPE html><html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KhawaChat</title>
+<style>
+body{
+  margin:0;
+  font-family: Arial;
+  background:#0a0a0a;
+  color:white;
+}.container{ display:flex; height:100vh; }
+
+.sidebar{ width:30%; background:#111; padding:10px; overflow:auto; }
+
+.chat{ flex:1; display:flex; flex-direction:column; }
+
+.messages{ flex:1; overflow:auto; padding:10px; }
+
+input,button{ padding:10px; border:none; border-radius:8px; margin:5px 0; }
+
+button{ background:white; cursor:pointer; }
+
+.msg{ margin:5px 0; padding:8px; background:#222; border-radius:8px; }
+
+.logo{ position:fixed; top:10px; left:10px; width:40px; }
+
+</style>
+</head>
+<body>
+<img src="logo.png" class="logo"><div id="auth">
+  <h2>Login / Register</h2>
+  <input id="email" placeholder="Email"><br>
+  <input id="password" type="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+</div><div id="app" style="display:none">
+  <div class="container">
+    <div class="sidebar">
+      <h3>Cari seseorang</h3>
+      <input id="search" placeholder="Search user">
+      <div id="users"></div>
+    </div><div class="chat">
+  <div class="messages" id="messages"></div>
+  <input id="msgInput" placeholder="Ketik pesan...">
+  <button onclick="sendMsg()">Kirim</button>
+</div>
+
+  </div>
+</div><script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
+  authDomain: "crowdedparty.firebaseapp.com",
+  projectId: "crowdedparty",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
+
+window.login = async ()=>{
+  let email = document.getElementById('email').value;
+  let pass = document.getElementById('password').value;
+  await signInWithEmailAndPassword(auth,email,pass);
+}
+
+window.register = async ()=>{
+  let email = document.getElementById('email').value;
+  let pass = document.getElementById('password').value;
+  await createUserWithEmailAndPassword(auth,email,pass);
+}
+
+onAuthStateChanged(auth,user=>{
+  if(user){
+    document.getElementById('auth').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadMessages();
+  }
+});
+
+async function sendMsg(){
+  let text = document.getElementById('msgInput').value;
+  await addDoc(collection(db,'messages'),{
+    text:text,
+    time:Date.now()
+  });
+}
+
+function loadMessages(){
+  const q = query(collection(db,'messages'),orderBy('time'));
+  onSnapshot(q,snap=>{
+    let html='';
+    snap.forEach(doc=>{
+      html+=`<div class='msg'>${doc.data().text}</div>`;
+    });
+    document.getElementById('messages').innerHTML=html;
+  });
+}
+</script></body>
+</html>
