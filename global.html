@@ -1,0 +1,77 @@
+
+<!DOCTYPE html><html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Chat</title>
+<style>
+body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
+.chat{display:flex;flex-direction:column;height:100vh}
+.messages{flex:1;overflow:auto;padding:10px}
+.msg{background:#222;margin:5px;padding:10px;border-radius:8px}
+input,button{padding:10px;border:none;border-radius:8px;margin:5px}
+button{background:white;color:black}
+</style>
+</head>
+<body><div class="chat">
+<div id="messages" class="messages"></div>
+<input id="msgInput" placeholder="Ketik di global chat">
+<button onclick="sendMsg()">Kirim</button>
+</div><script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const app = initializeApp({
+apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
+authDomain:"crowdedparty.firebaseapp.com",
+projectId:"crowdedparty"
+});
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let me=null;
+let lastSend=0;
+
+onAuthStateChanged(auth,(user)=>{
+if(!user){alert('Login dulu');window.location='index.html';return}
+me=user;
+loadMsg();
+});
+
+window.sendMsg=async()=>{
+let now=Date.now();
+if(now-lastSend<12000){alert('Tunggu 12 detik');return}
+if(!msgInput.value) return;
+lastSend=now;
+
+await addDoc(collection(db,'messages'),{
+text:msgInput.value,
+uid:me.uid,
+to:'global',
+time:now
+});
+msgInput.value="";
+}
+
+function loadMsg(){
+onSnapshot(collection(db,'messages'),snap=>{
+let arr=[];
+snap.forEach(d=>arr.push(d.data()));
+arr.sort((a,b)=>a.time-b.time);
+
+let html="";
+arr.forEach(m=>{
+if(m.to==='global'){
+html+=`<div class='msg'>${m.text}</div>`;
+}
+});
+
+messages.innerHTML=html;
+messages.scrollTop=messages.scrollHeight;
+});
+}
+
+</script></body>
+</html>
