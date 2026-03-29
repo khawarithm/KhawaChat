@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhawaChat FINAL STABLE</title>
+<title>KhawaChat</title>
 <style>
 body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
 .container{display:flex;height:100vh}
@@ -21,26 +20,22 @@ button{background:white;color:black;cursor:pointer}
 .avatar{width:25px;height:25px;border-radius:50%;margin:0 5px;cursor:pointer}
 .user{background:#1a1a1a;padding:8px;margin:5px;border-radius:8px;cursor:pointer}
 .delete{font-size:10px;color:red;cursor:pointer}
+.online{color:lime;font-size:10px}
 </style>
 </head>
-<body>
-
-<div id="authPage">
+<body><div id="authPage">
 <h2>Login</h2>
 <input id="email"><br>
 <input id="password" type="password"><br>
 <button onclick="login()">Login</button>
 <button onclick="register()">Register</button>
-</div>
-
-<div id="profileSetup" style="display:none">
+</div><div id="profileSetup" style="display:none">
 <h2>Profile</h2>
 <input id="username" placeholder="Username"><br>
+<input id="bio" placeholder="Bio"><br>
 <input type="file" id="photoFile"><br>
 <button onclick="saveProfile()">Save</button>
-</div>
-
-<div id="app" style="display:none">
+</div><div id="app" style="display:none">
 <div class="container">
 <div class="sidebar">
 <h3>Users</h3>
@@ -49,34 +44,33 @@ button{background:white;color:black;cursor:pointer}
 </div>
 <div class="chat">
 <div id="messages" class="messages"></div>
-<input id="msgInput" placeholder="Ketik pesan">
+<input id="msgInput" placeholder="Ketik pesan" oninput="typing()">
 <button onclick="sendMsg()">Send</button>
+<div id="typingStatus"></div>
 </div>
 </div>
-</div>
-
-<div id="profilePopup" style="display:none;position:fixed;top:20%;left:50%;transform:translateX(-50%);background:#111;padding:20px;border-radius:10px">
+</div><div id="profilePopup" style="display:none;position:fixed;top:20%;left:50%;transform:translateX(-50%);background:#111;padding:20px;border-radius:10px">
 <h3 id="pName"></h3>
+<p id="pBio"></p>
 <img id="pImg" width="80"><br>
 <button onclick="closeProfile()">Close</button>
-</div>
-
-<script type="module">
+</div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-const firebaseConfig = {
+const appFirebase = initializeApp({
 apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
 authDomain:"crowdedparty.firebaseapp.com",
 projectId:"crowdedparty"
-};
+});
 
-const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth(appFirebase);
 const db = getFirestore(appFirebase);
 
-let me=null,chat='global',usersCache={},lastSend=0;
+let me=null,chat='global',usersCache={},lastSend=0,lastMsgTime=0;
+
+Notification.requestPermission();
 
 window.login=()=>signInWithEmailAndPassword(auth,email.value,password.value);
 window.register=()=>createUserWithEmailAndPassword(auth,email.value,password.value);
@@ -85,6 +79,7 @@ onAuthStateChanged(auth,async u=>{
 if(!u) return;
 me=u;
 authPage.style.display='none';
+
 let snap=await getDoc(doc(db,'users',u.uid));
 if(!snap.exists()) profileSetup.style.display='block';
 else{app.style.display='block';init();}
@@ -95,7 +90,7 @@ function fileToBase64(f){return new Promise(r=>{let rd=new FileReader();rd.onloa
 window.saveProfile=async()=>{
 let file=photoFile.files[0];
 let photo=file?await fileToBase64(file):"";
-await setDoc(doc(db,'users',me.uid),{username:username.value,photo:photo});
+await setDoc(doc(db,'users',me.uid),{username:username.value,bio:bio.value,photo:photo,rating:0,totalRate:0,online:true});
 profileSetup.style.display='none';app.style.display='block';init();
 }
 
@@ -103,7 +98,8 @@ window.editProfile=async()=>{
 let snap=await getDoc(doc(db,'users',me.uid));
 let d=snap.data();
 let name=prompt('Username',d.username);
-await updateDoc(doc(db,'users',me.uid),{username:name});
+let bioo=prompt('Bio',d.bio);
+await updateDoc(doc(db,'users',me.uid),{username:name,bio:bioo});
 loadUsers();
 }
 
@@ -112,7 +108,16 @@ async function init(){await loadUsers();loadMsgs();}
 async function loadUsers(){
 let snap=await getDocs(collection(db,'users'));
 let html="";usersCache={};
-snap.forEach(d=>{usersCache[d.id]=d.data();html+=`<div class='user' onclick="openChat('${d.id}')">${d.data().username}</div>`});
+
+snap.forEach(d=>{
+let data=d.data();
+usersCache[d.id]=data;
+html+=`<div class='user' onclick="openChat('${d.id}')">
+${data.username} ⭐${(data.rating||0).toFixed(1)}
+<div class='online'>${data.online?'online':'offline'}</div>
+</div>`;
+});
+
 users.innerHTML=html;
 }
 
@@ -123,7 +128,14 @@ if(!msgInput.value) return;
 let now=Date.now();
 if(chat==='global' && now-lastSend<12000){alert('Cooldown 12 detik');return}
 lastSend=now;
-await addDoc(collection(db,'messages'),{text:msgInput.value,uid:me.uid,to:chat,time:now});
+
+await addDoc(collection(db,'messages'),{
+text:msgInput.value,
+uid:me.uid,
+to:chat,
+time:now
+});
+
 msgInput.value="";
 }
 
@@ -131,6 +143,7 @@ function loadMsgs(){
 onSnapshot(collection(db,'messages'),snap=>{
 let arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));
 arr.sort((a,b)=>a.time-b.time);
+
 let html="";
 arr.forEach(m=>{
 if(!usersCache[m.uid]) return;
@@ -141,31 +154,64 @@ let isMe=m.uid===me.uid;
 let user=usersCache[m.uid];
 let photo=user.photo||"https://i.imgur.com/HeIi0wU.png";
 
+if(!isMe && m.time>lastMsgTime && document.hidden){
+new Notification(user.username,{body:m.text});
+}
+lastMsgTime=m.time;
+
 html+=`<div class='msgRow ${isMe?'me':'other'}'>
 ${!isMe?`<img src='${photo}' class='avatar' onclick="showProfile('${m.uid}')">`:''}
 <div>
 <div class='msg'>${m.text}</div>
 ${isMe?`<div class='delete' onclick="delMsg('${m.id}')">hapus</div>`:''}
+${!isMe?ratingUI(m.uid):''}
 </div>
 ${isMe?`<img src='${photo}' class='avatar' onclick="showProfile('${m.uid}')">`:''}
 </div>`;
 });
+
 messages.innerHTML=html;
 messages.scrollTop=messages.scrollHeight;
 });
 }
 
-window.delMsg=id=>deleteDoc(doc(db,'messages',id));
+function ratingUI(uid){
+return `<div>${[1,2,3,4,5].map(s=>`<span onclick="rateUser('${uid}',${s})">⭐</span>`).join('')}</div>`;
+}
+
+window.rateUser=async(uid,star)=>{
+let ref=doc(db,'users',uid);
+let snap=await getDoc(ref);
+let d=snap.data();
+
+let total=d.totalRate||0;
+let rating=d.rating||0;
+
+let newTotal=total+1;
+let newRating=((rating*total)+star)/newTotal;
+
+await updateDoc(ref,{rating:newRating,totalRate:newTotal});
+alert('Rated!');
+}
+
+window.delMsg=async(id)=>{
+await updateDoc(doc(db,'messages',id),{text:'[pesan dihapus]'});
+}
 
 window.showProfile=id=>{
 let u=usersCache[id];
 pName.innerText=u.username;
+pBio.innerText=u.bio||'';
 pImg.src=u.photo||"https://i.imgur.com/HeIi0wU.png";
 profilePopup.style.display='block';
 }
 
 window.closeProfile=()=>profilePopup.style.display='none';
 
-</script>
-</body>
+window.typing=()=>{
+typingStatus.innerText='Mengetik...';
+setTimeout(()=>typingStatus.innerText='',1000);
+}
+
+</script></body>
 </html>
