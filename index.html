@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>KhawaChat - Chat Modern</title>
 <style>
 * {
@@ -16,7 +16,10 @@ body {
   background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   color: white;
   min-height: 100vh;
+  height: 100vh;
   overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
 
 /* LOGIN PAGE */
@@ -26,6 +29,7 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  height: 100vh;
 }
 
 .auth-card {
@@ -75,7 +79,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   color: white;
-  font-size: 15px;
+  font-size: 16px;
   transition: all 0.3s;
   outline: none;
 }
@@ -124,10 +128,11 @@ body {
 
 /* PROFILE SETUP */
 #profileSetup {
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  height: 100vh;
   padding: 20px;
 }
 
@@ -171,9 +176,12 @@ body {
 
 /* MAIN APP */
 #app {
-  display: flex;
+  display: none;
   height: 100vh;
   width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 .container {
@@ -189,6 +197,7 @@ body {
   top: 0;
   left: 0;
   width: 320px;
+  max-width: 85vw;
   height: 100vh;
   background: rgba(14, 14, 24, 0.98);
   backdrop-filter: blur(20px);
@@ -328,7 +337,7 @@ body {
   color: #ffaa00;
 }
 
-.edit-profile-btn {
+.edit-profile-btn, .logout-btn {
   width: 100%;
   padding: 10px;
   background: rgba(255, 255, 255, 0.05);
@@ -336,12 +345,23 @@ body {
   border-radius: 10px;
   color: white;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 8px;
   transition: all 0.3s;
+  font-size: 14px;
 }
 
 .edit-profile-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+  background: rgba(255, 50, 50, 0.1);
+  border-color: rgba(255, 50, 50, 0.3);
+  color: #ff6b6b;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 50, 50, 0.2);
 }
 
 .sidebar-overlay {
@@ -365,51 +385,66 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
   background: rgba(10, 10, 20, 0.8);
 }
 
 .chat-header {
-  padding: 15px 20px;
+  padding: 12px 15px;
   background: rgba(14, 14, 24, 0.95);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   backdrop-filter: blur(20px);
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .menu-toggle {
   background: none;
   border: none;
   color: white;
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
-  padding: 5px;
+  padding: 5px 8px;
   display: flex;
   align-items: center;
+}
+
+.chat-header-info {
+  flex: 1;
+  cursor: pointer;
+}
+
+.chat-header-title {
+  font-weight: 600;
+  font-size: 15px;
 }
 
 .global-badge {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 11px;
   font-weight: 600;
+  display: inline-block;
 }
 
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .msgRow {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   animation: fadeInUp 0.3s ease;
 }
 
@@ -422,8 +457,8 @@ body {
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   cursor: pointer;
   object-fit: cover;
@@ -440,9 +475,10 @@ body {
 .msg {
   padding: 10px 14px;
   border-radius: 16px;
-  max-width: 65%;
+  max-width: 75%;
   font-size: 14px;
   line-height: 1.4;
+  word-break: break-word;
   position: relative;
 }
 
@@ -461,8 +497,9 @@ body {
 .msg-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 4px;
+  gap: 4px;
+  margin-top: 3px;
+  flex-wrap: wrap;
 }
 
 .delete-btn {
@@ -470,8 +507,8 @@ body {
   border: none;
   color: rgba(255, 100, 100, 0.7);
   cursor: pointer;
-  font-size: 12px;
-  padding: 2px 6px;
+  font-size: 11px;
+  padding: 2px 5px;
   border-radius: 4px;
   transition: all 0.3s;
 }
@@ -485,10 +522,10 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   padding: 2px;
   transition: all 0.2s;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .rate-btn:hover {
@@ -498,28 +535,35 @@ body {
 
 .rate-btn.rated {
   opacity: 1;
-  filter: none;
+}
+
+.rate-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .chat-input-area {
-  padding: 15px 20px;
+  padding: 10px 12px;
   background: rgba(14, 14, 24, 0.95);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .chat-input-area input {
   flex: 1;
-  padding: 12px 18px;
+  padding: 12px 16px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 25px;
   color: white;
-  font-size: 14px;
+  font-size: 15px;
   outline: none;
   transition: all 0.3s;
+  min-width: 0;
 }
 
 .chat-input-area input:focus {
@@ -528,14 +572,17 @@ body {
 }
 
 .send-btn {
-  padding: 12px 20px;
+  padding: 12px 18px;
   background: linear-gradient(135deg, #667eea, #764ba2);
   border: none;
   border-radius: 25px;
   color: white;
   cursor: pointer;
   font-weight: 600;
+  font-size: 16px;
   transition: all 0.3s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .send-btn:hover {
@@ -544,12 +591,13 @@ body {
 }
 
 .typing-indicator {
-  padding: 5px 20px;
+  padding: 4px 15px;
   font-size: 12px;
   color: #ffaa00;
-  display: flex;
+  display: none;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
 .typing-dots {
@@ -584,35 +632,36 @@ body {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 30px;
+  padding: 25px;
   z-index: 200;
-  min-width: 300px;
+  min-width: 280px;
+  max-width: 90vw;
   text-align: center;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }
 
 #profilePopup img {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 #profilePopup h3 {
-  font-size: 20px;
-  margin-bottom: 5px;
+  font-size: 18px;
+  margin-bottom: 4px;
 }
 
 #profilePopup p {
   color: #999;
-  margin-bottom: 15px;
-  font-size: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
 }
 
 .profile-close-btn {
-  padding: 10px 30px;
+  padding: 10px 25px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
@@ -638,28 +687,61 @@ body {
 
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 100%;
-    max-width: 350px;
-  }
-
   .msg {
-    max-width: 80%;
-    font-size: 13px;
+    max-width: 85%;
   }
 
   .chat-input-area {
+    padding: 8px 10px;
+  }
+
+  .chat-input-area input {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .send-btn {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  .messages {
     padding: 10px;
   }
 
-  .auth-card, .profile-card {
-    margin: 10px;
+  .chat-header {
+    padding: 10px 12px;
+  }
+
+  .chat-header-title {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .msg {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .avatar {
+    width: 26px;
+    height: 26px;
+  }
+
+  .chat-input-area input {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .send-btn {
+    padding: 10px 12px;
   }
 }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 ::-webkit-scrollbar-track {
@@ -687,21 +769,21 @@ body {
 </div>
 
 <!-- PROFILE SETUP -->
-<div id="profileSetup" style="display:none">
+<div id="profileSetup">
   <div class="profile-card">
     <h2>🎨 Setup Profile</h2>
-    <input class="auth-input" id="username" placeholder="Username kerenmu">
-    <input class="auth-input" id="bio" placeholder="Bio singkat">
-    <label class="file-upload">
+    <input class="auth-input" id="username" placeholder="Username kerenmu" maxlength="20">
+    <input class="auth-input" id="bio" placeholder="Bio singkat" maxlength="100">
+    <label class="file-upload" id="fileLabel">
       📸 Pilih Foto Profile
-      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="this.parentElement.textContent=this.files[0]?.name||'Pilih Foto'">
+      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="document.getElementById('fileLabel').childNodes[0].textContent=this.files[0]?.name||'📸 Pilih Foto Profile'">
     </label>
     <button class="auth-btn btn-primary" onclick="saveProfile()" style="margin-top:15px">💾 Simpan Profile</button>
   </div>
 </div>
 
 <!-- MAIN APP -->
-<div id="app" style="display:none">
+<div id="app">
   <div class="container">
     <!-- SIDEBAR OVERLAY -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -715,6 +797,7 @@ body {
           <button onclick="searchUsers()">Cari</button>
         </div>
         <button class="edit-profile-btn" onclick="editProfile()">✏️ Edit Profile</button>
+        <button class="logout-btn" onclick="logout()">🚪 Log Out</button>
       </div>
       <div id="users"></div>
     </div>
@@ -723,11 +806,13 @@ body {
     <div class="chat">
       <div class="chat-header">
         <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-        <span id="chatTitle">🌍 Global Chat</span>
-        <span class="global-badge" id="chatBadge">Global</span>
+        <div class="chat-header-info" onclick="switchToGlobal()">
+          <div class="chat-header-title" id="chatTitle">🌍 Global Chat</div>
+          <span class="global-badge" id="chatBadge">Global</span>
+        </div>
       </div>
       <div class="messages" id="messages"></div>
-      <div class="typing-indicator" id="typingArea" style="display:none">
+      <div class="typing-indicator" id="typingArea">
         <div class="typing-dots">
           <span></span><span></span><span></span>
         </div>
@@ -735,7 +820,7 @@ body {
       </div>
       <div class="chat-input-area">
         <input id="msgInput" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="if(event.key==='Enter')sendMsg()">
-        <button class="send-btn" onclick="sendMsg()">➤</button>
+        <button class="send-btn" onclick="sendMsg()">Kirim</button>
       </div>
     </div>
   </div>
@@ -753,8 +838,8 @@ body {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const appFirebase = initializeApp({
   apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
@@ -776,22 +861,51 @@ let sidebarOpen = false;
 
 Notification.requestPermission();
 
-// AUTH
-window.login = () => signInWithEmailAndPassword(auth, email.value, password.value);
-window.register = () => createUserWithEmailAndPassword(auth, email.value, password.value);
+// AUTH FUNCTIONS
+window.login = () => {
+  const emailVal = document.getElementById('email').value.trim();
+  const passVal = document.getElementById('password').value;
+  if(!emailVal || !passVal) return alert('Email dan password harus diisi!');
+  signInWithEmailAndPassword(auth, emailVal, passVal).catch(e => alert('Login gagal: ' + e.message));
+};
+
+window.register = () => {
+  const emailVal = document.getElementById('email').value.trim();
+  const passVal = document.getElementById('password').value;
+  if(!emailVal || !passVal) return alert('Email dan password harus diisi!');
+  if(passVal.length < 6) return alert('Password minimal 6 karakter!');
+  createUserWithEmailAndPassword(auth, emailVal, passVal).catch(e => alert('Register gagal: ' + e.message));
+};
+
+window.logout = async () => {
+  if(!confirm('Yakin ingin logout?')) return;
+  await setOnlineStatus(false);
+  await signOut(auth);
+  currentChat = 'global';
+  usersCache = {};
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('profileSetup').style.display = 'none';
+  document.getElementById('authPage').style.display = 'flex';
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
+  if(sidebarOpen) toggleSidebar();
+};
 
 onAuthStateChanged(auth, async u => {
-  if(!u) return;
+  if(!u) {
+    me = null;
+    return;
+  }
   me = u;
-  authPage.style.display = 'none';
+  document.getElementById('authPage').style.display = 'none';
 
   let snap = await getDoc(doc(db, 'users', u.uid));
   if(!snap.exists()) {
-    profileSetup.style.display = 'flex';
-    profileSetup.style.justifyContent = 'center';
-    profileSetup.style.alignItems = 'center';
+    document.getElementById('profileSetup').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
   } else {
-    app.style.display = 'flex';
+    document.getElementById('profileSetup').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
     init();
   }
 });
@@ -807,12 +921,13 @@ function fileToBase64(f) {
 
 // PROFILE
 window.saveProfile = async () => {
-  if(!username.value.trim()) return alert('Username wajib diisi!');
-  let file = photoFile.files[0];
+  const usernameVal = document.getElementById('username').value.trim();
+  if(!usernameVal) return alert('Username wajib diisi!');
+  let file = document.getElementById('photoFile').files[0];
   let photo = file ? await fileToBase64(file) : "";
   await setDoc(doc(db, 'users', me.uid), {
-    username: username.value.trim(),
-    bio: bio.value.trim(),
+    username: usernameVal,
+    bio: document.getElementById('bio').value.trim(),
     photo: photo,
     rating: 0,
     totalRate: 0,
@@ -820,8 +935,8 @@ window.saveProfile = async () => {
     typing: false,
     typingTo: ''
   });
-  profileSetup.style.display = 'none';
-  app.style.display = 'flex';
+  document.getElementById('profileSetup').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
   init();
 };
 
@@ -829,7 +944,7 @@ window.editProfile = async () => {
   let snap = await getDoc(doc(db, 'users', me.uid));
   let d = snap.data();
   let name = prompt('Username baru:', d.username);
-  if(!name) return;
+  if(!name || !name.trim()) return;
   let bioo = prompt('Bio baru:', d.bio);
   if(bioo === null) return;
   await updateDoc(doc(db, 'users', me.uid), {
@@ -837,7 +952,6 @@ window.editProfile = async () => {
     bio: bioo.trim()
   });
   await loadUsers();
-  toggleSidebar();
 };
 
 // INIT
@@ -845,6 +959,7 @@ async function init() {
   await loadMyRatings();
   await loadUsers();
   loadMsgs();
+  setOnlineStatus(true);
 }
 
 async function loadMyRatings() {
@@ -872,25 +987,20 @@ async function loadUsers(searchTerm = '') {
   });
 
   // Filter & sort
+  users = users.filter(u => u.id !== me.uid);
+  
   if(searchTerm) {
     users = users.filter(u => 
-      u.username.toLowerCase().includes(searchTerm.toLowerCase()) && 
-      u.id !== me.uid
+      u.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    // Sort by rating, online first
-    users.sort((a, b) => {
-      if(a.online && !b.online) return -1;
-      if(!a.online && b.online) return 1;
-      return (b.rating || 0) - (a.rating || 0);
-    });
-  } else {
-    users = users.filter(u => u.id !== me.uid);
-    users.sort((a, b) => {
-      if(a.online && !b.online) return -1;
-      if(!a.online && b.online) return 1;
-      return (b.rating || 0) - (a.rating || 0);
-    });
   }
+  
+  // Sort: online first, then by rating
+  users.sort((a, b) => {
+    if(a.online && !b.online) return -1;
+    if(!a.online && b.online) return 1;
+    return (b.rating || 0) - (a.rating || 0);
+  });
 
   let html = '';
   users.forEach(u => {
@@ -933,16 +1043,17 @@ window.openChat = (id) => {
   currentChat = id;
   let user = usersCache[id];
   if(user) {
-    document.getElementById('chatTitle').textContent = `💬 ${user.username}`;
+    document.getElementById('chatTitle').textContent = '💬 ' + user.username;
     document.getElementById('chatBadge').textContent = 'Private';
     document.getElementById('chatBadge').style.background = 'linear-gradient(135deg, #00c853, #69f0ae)';
   }
   loadMsgs();
   toggleSidebar();
+  document.getElementById('msgInput').focus();
 };
 
 // Switch to global
-document.getElementById('chatTitle').onclick = () => {
+window.switchToGlobal = () => {
   currentChat = 'global';
   document.getElementById('chatTitle').textContent = '🌍 Global Chat';
   document.getElementById('chatBadge').textContent = 'Global';
@@ -952,7 +1063,7 @@ document.getElementById('chatTitle').onclick = () => {
 
 // SEND MESSAGE
 window.sendMsg = async () => {
-  let text = msgInput.value.trim();
+  let text = document.getElementById('msgInput').value.trim();
   if(!text) return;
 
   let now = Date.now();
@@ -969,7 +1080,7 @@ window.sendMsg = async () => {
     time: now
   });
 
-  msgInput.value = '';
+  document.getElementById('msgInput').value = '';
   
   // Update my typing status to false
   await updateDoc(doc(db, 'users', me.uid), { typing: false, typingTo: '' });
@@ -1022,9 +1133,9 @@ function loadMsgs() {
       <div class="msgRow ${isMe ? 'me' : 'other'}">
         ${!isMe ? `<img src="${photo}" class="avatar" onclick="showProfile('${m.uid}')">` : ''}
         <div>
-          <div class="msg">${m.text}</div>
+          <div class="msg">${escapeHtml(m.text)}</div>
           <div class="msg-actions">
-            ${isMe ? `<button class="delete-btn" onclick="delMsg('${m.id}')">🗑 Hapus</button>` : ''}
+            ${isMe ? `<button class="delete-btn" onclick="delMsg('${m.id}')">🗑</button>` : ''}
             ${!isMe ? ratingUI(m.uid) : ''}
           </div>
         </div>
@@ -1051,14 +1162,23 @@ function loadMsgs() {
     let typingText = document.getElementById('typingText');
     if(typingUser) {
       typingArea.style.display = 'flex';
-      typingText.textContent = `${typingUser} sedang mengetik...`;
+      typingText.textContent = typingUser + ' sedang mengetik...';
     } else {
       typingArea.style.display = 'none';
     }
 
-    // Also refresh users list periodically
-    if(sidebarOpen) loadUsers();
+    // Refresh users list if sidebar is open
+    if(sidebarOpen) {
+      let searchTerm = document.getElementById('searchInput')?.value || '';
+      loadUsers(searchTerm);
+    }
   });
+}
+
+function escapeHtml(text) {
+  let div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // RATING SYSTEM
@@ -1067,20 +1187,23 @@ function ratingUI(uid) {
   let stars = [1,2,3,4,5].map(s => 
     `<button class="rate-btn ${rated >= s ? 'rated' : ''}" 
       onclick="rateUser('${uid}', ${s})" 
-      ${rated > 0 ? 'disabled' : ''}>⭐</button>`
+      ${rated > 0 ? 'disabled' : ''}
+      style="${rated > 0 ? 'cursor:not-allowed' : ''}">⭐</button>`
   ).join('');
   
   if(rated > 0) {
-    stars += ' <span style="font-size:10px;color:#888">(Sudah dirate)</span>';
+    stars += ' <span style="font-size:9px;color:#888">(Done)</span>';
   }
-  return stars;
+  return `<div style="display:flex;align-items:center;gap:2px">${stars}</div>`;
 }
 
 window.rateUser = async (uid, star) => {
   if(myRatings[uid]) {
-    alert('Kamu sudah memberikan rating ke pengguna ini!');
+    alert('⚠️ Kamu sudah memberikan rating ke pengguna ini!');
     return;
   }
+
+  if(!confirm(`Beri rating ${star} bintang ke pengguna ini?`)) return;
 
   let ref = doc(db, 'users', uid);
   let snap = await getDoc(ref);
@@ -1125,19 +1248,20 @@ window.closeProfile = () => {
 // ONLINE STATUS
 async function setOnlineStatus(status) {
   if(!me) return;
-  await updateDoc(doc(db, 'users', me.uid), { 
-    online: status,
-    typing: false,
-    typingTo: ''
-  });
+  try {
+    await updateDoc(doc(db, 'users', me.uid), { 
+      online: status,
+      typing: false,
+      typingTo: ''
+    });
+  } catch(e) {
+    console.log('Status update error:', e);
+  }
 }
 
 window.addEventListener('beforeunload', () => setOnlineStatus(false));
-window.addEventListener('focus', () => setOnlineStatus(true));
-window.addEventListener('blur', () => setOnlineStatus(false));
-
-// Initial online status
-setOnlineStatus(true);
+window.addEventListener('focus', () => { if(me) setOnlineStatus(true); });
+window.addEventListener('blur', () => { if(me) setOnlineStatus(false); });
 
 </script>
 </body>
