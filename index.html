@@ -15,11 +15,12 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   color: white;
-  min-height: 100vh;
   height: 100vh;
+  width: 100vw;
   overflow: hidden;
   position: fixed;
-  width: 100%;
+  top: 0;
+  left: 0;
 }
 
 /* LOGIN PAGE */
@@ -27,9 +28,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  padding: 20px;
   height: 100vh;
+  width: 100vw;
+  padding: 20px;
 }
 
 .auth-card {
@@ -131,8 +132,8 @@ body {
   display: none;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   height: 100vh;
+  width: 100vw;
   padding: 20px;
 }
 
@@ -199,6 +200,7 @@ body {
   width: 320px;
   max-width: 85vw;
   height: 100vh;
+  height: 100dvh;
   background: rgba(14, 14, 24, 0.98);
   backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -256,6 +258,7 @@ body {
   color: white;
   cursor: pointer;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 #users {
@@ -390,7 +393,7 @@ body {
 }
 
 .chat-header {
-  padding: 12px 15px;
+  padding: 10px 15px;
   background: rgba(14, 14, 24, 0.95);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
@@ -399,37 +402,44 @@ body {
   backdrop-filter: blur(20px);
   flex-shrink: 0;
   z-index: 10;
+  min-height: 50px;
 }
 
 .menu-toggle {
   background: none;
   border: none;
   color: white;
-  font-size: 22px;
+  font-size: 24px;
   cursor: pointer;
   padding: 5px 8px;
   display: flex;
   align-items: center;
+  line-height: 1;
 }
 
 .chat-header-info {
   flex: 1;
   cursor: pointer;
+  min-width: 0;
 }
 
 .chat-header-title {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .global-badge {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  padding: 4px 10px;
-  border-radius: 15px;
+  padding: 3px 10px;
+  border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
   display: inline-block;
+  margin-top: 2px;
 }
 
 .messages {
@@ -438,14 +448,21 @@ body {
   padding: 15px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   -webkit-overflow-scrolling: touch;
+  overflow-anchor: none;
+}
+
+.messages-bottom {
+  overflow-anchor: auto;
+  height: 1px;
 }
 
 .msgRow {
   display: flex;
   gap: 6px;
   animation: fadeInUp 0.3s ease;
+  flex-shrink: 0;
 }
 
 .msgRow.me {
@@ -465,6 +482,7 @@ body {
   border: 2px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .avatar:hover {
@@ -472,14 +490,29 @@ body {
   transform: scale(1.1);
 }
 
+.msg-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 75%;
+}
+
+.me .msg-content-wrapper {
+  align-items: flex-end;
+}
+
+.other .msg-content-wrapper {
+  align-items: flex-start;
+}
+
 .msg {
   padding: 10px 14px;
   border-radius: 16px;
-  max-width: 75%;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 15px;
+  line-height: 1.5;
   word-break: break-word;
-  position: relative;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
 }
 
 .me .msg {
@@ -498,7 +531,7 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-top: 3px;
+  margin-top: 4px;
   flex-wrap: wrap;
 }
 
@@ -507,8 +540,8 @@ body {
   border: none;
   color: rgba(255, 100, 100, 0.7);
   cursor: pointer;
-  font-size: 11px;
-  padding: 2px 5px;
+  font-size: 12px;
+  padding: 2px 6px;
   border-radius: 4px;
   transition: all 0.3s;
 }
@@ -542,52 +575,10 @@ body {
   cursor: not-allowed;
 }
 
-.chat-input-area {
-  padding: 10px 12px;
-  background: rgba(14, 14, 24, 0.95);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-shrink: 0;
-  z-index: 10;
-}
-
-.chat-input-area input {
-  flex: 1;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 25px;
-  color: white;
-  font-size: 15px;
-  outline: none;
-  transition: all 0.3s;
-  min-width: 0;
-}
-
-.chat-input-area input:focus {
-  border-color: #667eea;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.send-btn {
-  padding: 12px 18px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border: none;
-  border-radius: 25px;
-  color: white;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 16px;
-  transition: all 0.3s;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.send-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+.rated-label {
+  font-size: 9px;
+  color: #888;
+  margin-left: 4px;
 }
 
 .typing-indicator {
@@ -598,6 +589,7 @@ body {
   align-items: center;
   gap: 5px;
   flex-shrink: 0;
+  min-height: 20px;
 }
 
 .typing-dots {
@@ -619,6 +611,65 @@ body {
 @keyframes typingBounce {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-6px); }
+}
+
+.chat-input-area {
+  padding: 10px 12px;
+  background: rgba(14, 14, 24, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 10;
+  min-height: 60px;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  color: white;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s;
+  min-width: 0;
+  height: 44px;
+  line-height: 1.2;
+}
+
+.chat-input-area input::placeholder {
+  color: #666;
+  font-size: 14px;
+}
+
+.chat-input-area input:focus {
+  border-color: #667eea;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.send-btn {
+  padding: 10px 20px;
+  height: 44px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-btn:active {
+  transform: scale(0.95);
 }
 
 /* PROFILE POPUP */
@@ -687,21 +738,29 @@ body {
 
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
-  .msg {
+  .msg-content-wrapper {
     max-width: 85%;
+  }
+
+  .msg {
+    font-size: 14px;
+    padding: 8px 12px;
   }
 
   .chat-input-area {
     padding: 8px 10px;
+    min-height: 55px;
   }
 
   .chat-input-area input {
-    font-size: 14px;
+    font-size: 15px;
     padding: 10px 14px;
+    height: 40px;
   }
 
   .send-btn {
-    padding: 10px 15px;
+    padding: 8px 16px;
+    height: 40px;
     font-size: 14px;
   }
 
@@ -710,18 +769,28 @@ body {
   }
 
   .chat-header {
-    padding: 10px 12px;
+    padding: 8px 12px;
+    min-height: 45px;
   }
 
   .chat-header-title {
     font-size: 14px;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
   }
 }
 
 @media (max-width: 400px) {
   .msg {
     font-size: 13px;
-    padding: 8px 10px;
+    padding: 7px 10px;
+  }
+
+  .msg-content-wrapper {
+    max-width: 85%;
   }
 
   .avatar {
@@ -730,12 +799,15 @@ body {
   }
 
   .chat-input-area input {
-    font-size: 13px;
-    padding: 10px 12px;
+    font-size: 14px;
+    padding: 8px 12px;
+    height: 38px;
   }
 
   .send-btn {
-    padding: 10px 12px;
+    padding: 6px 14px;
+    height: 38px;
+    font-size: 13px;
   }
 }
 
@@ -751,6 +823,21 @@ body {
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
+}
+
+/* Fix untuk iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  body {
+    height: -webkit-fill-available;
+  }
+  
+  #app {
+    height: -webkit-fill-available;
+  }
+  
+  .sidebar {
+    height: -webkit-fill-available;
+  }
 }
 </style>
 </head>
@@ -803,7 +890,7 @@ body {
     </div>
 
     <!-- CHAT AREA -->
-    <div class="chat">
+    <div class="chat" id="chatContainer">
       <div class="chat-header">
         <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
         <div class="chat-header-info" onclick="switchToGlobal()">
@@ -818,8 +905,8 @@ body {
         </div>
         <span id="typingText"></span>
       </div>
-      <div class="chat-input-area">
-        <input id="msgInput" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="if(event.key==='Enter')sendMsg()">
+      <div class="chat-input-area" id="chatInputArea">
+        <input id="msgInput" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="if(event.key==='Enter')sendMsg()" autocomplete="off">
         <button class="send-btn" onclick="sendMsg()">Kirim</button>
       </div>
     </div>
@@ -858,6 +945,13 @@ let lastMsgTime = 0;
 let typingTimers = {};
 let myRatings = {};
 let sidebarOpen = false;
+let messagesUnsub = null;
+let usersUnsub = null;
+
+// Pastikan input selalu ada
+console.log('App loaded, checking elements:');
+console.log('msgInput:', document.getElementById('msgInput'));
+console.log('sendBtn:', document.querySelector('.send-btn'));
 
 Notification.requestPermission();
 
@@ -880,6 +974,11 @@ window.register = () => {
 window.logout = async () => {
   if(!confirm('Yakin ingin logout?')) return;
   await setOnlineStatus(false);
+  
+  // Unsub semua listener
+  if(messagesUnsub) messagesUnsub();
+  if(usersUnsub) usersUnsub();
+  
   await signOut(auth);
   currentChat = 'global';
   usersCache = {};
@@ -896,7 +995,7 @@ onAuthStateChanged(auth, async u => {
     me = null;
     return;
   }
-  me = u;
+   me = u;
   document.getElementById('authPage').style.display = 'none';
 
   let snap = await getDoc(doc(db, 'users', u.uid));
@@ -906,6 +1005,13 @@ onAuthStateChanged(auth, async u => {
   } else {
     document.getElementById('profileSetup').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
+    
+    // Pastikan input visible
+    setTimeout(() => {
+      document.getElementById('msgInput').focus();
+      console.log('Input focused');
+    }, 500);
+    
     init();
   }
 });
@@ -937,6 +1043,11 @@ window.saveProfile = async () => {
   });
   document.getElementById('profileSetup').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
+  
+  setTimeout(() => {
+    document.getElementById('msgInput').focus();
+  }, 500);
+  
   init();
 };
 
@@ -960,6 +1071,12 @@ async function init() {
   await loadUsers();
   loadMsgs();
   setOnlineStatus(true);
+  
+  // Focus input
+  setTimeout(() => {
+    let input = document.getElementById('msgInput');
+    if(input) input.focus();
+  }, 1000);
 }
 
 async function loadMyRatings() {
@@ -972,6 +1089,13 @@ window.toggleSidebar = () => {
   sidebarOpen = !sidebarOpen;
   document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
   document.getElementById('sidebarOverlay').classList.toggle('show', sidebarOpen);
+  
+  // Focus input setelah sidebar close
+  if(!sidebarOpen) {
+    setTimeout(() => {
+      document.getElementById('msgInput').focus();
+    }, 300);
+  }
 };
 
 // LOAD USERS
@@ -1018,9 +1142,9 @@ async function loadUsers(searchTerm = '') {
 
     html += `
     <div class="user-card" onclick="openChat('${u.id}')">
-      <img class="user-card-avatar" src="${u.photo || 'https://i.imgur.com/HeIi0wU.png'}">
+      <img class="user-card-avatar" src="${u.photo || 'https://i.imgur.com/HeIi0wU.png'}" onerror="this.src='https://i.imgur.com/HeIi0wU.png'">
       <div class="user-card-info">
-        <div class="user-card-name">${u.username}</div>
+        <div class="user-card-name">${escapeHtml(u.username)}</div>
         <div class="user-card-status">
           <span class="status-dot ${statusClass}"></span>
           ${statusText}
@@ -1049,7 +1173,9 @@ window.openChat = (id) => {
   }
   loadMsgs();
   toggleSidebar();
-  document.getElementById('msgInput').focus();
+  setTimeout(() => {
+    document.getElementById('msgInput').focus();
+  }, 400);
 };
 
 // Switch to global
@@ -1063,7 +1189,13 @@ window.switchToGlobal = () => {
 
 // SEND MESSAGE
 window.sendMsg = async () => {
-  let text = document.getElementById('msgInput').value.trim();
+  let inputEl = document.getElementById('msgInput');
+  if(!inputEl) {
+    console.error('Input element not found!');
+    return;
+  }
+  
+  let text = inputEl.value.trim();
   if(!text) return;
 
   let now = Date.now();
@@ -1073,17 +1205,23 @@ window.sendMsg = async () => {
   }
   lastSend = now;
 
-  await addDoc(collection(db, 'messages'), {
-    text: text,
-    uid: me.uid,
-    to: currentChat,
-    time: now
-  });
+  try {
+    await addDoc(collection(db, 'messages'), {
+      text: text,
+      uid: me.uid,
+      to: currentChat,
+      time: now
+    });
 
-  document.getElementById('msgInput').value = '';
-  
-  // Update my typing status to false
-  await updateDoc(doc(db, 'users', me.uid), { typing: false, typingTo: '' });
+    inputEl.value = '';
+    inputEl.focus();
+    
+    // Update my typing status to false
+    await updateDoc(doc(db, 'users', me.uid), { typing: false, typingTo: '' });
+  } catch(e) {
+    console.error('Send message error:', e);
+    alert('Gagal mengirim pesan: ' + e.message);
+  }
 };
 
 // TYPING
@@ -1106,7 +1244,11 @@ window.handleTyping = async () => {
 
 // LOAD MESSAGES
 function loadMsgs() {
-  onSnapshot(collection(db, 'messages'), snap => {
+  // Unsub previous listener
+  if(messagesUnsub) messagesUnsub();
+  if(usersUnsub) usersUnsub();
+  
+  messagesUnsub = onSnapshot(collection(db, 'messages'), snap => {
     let arr = [];
     snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
     arr.sort((a, b) => a.time - b.time);
@@ -1125,21 +1267,23 @@ function loadMsgs() {
       let photo = user.photo || "https://i.imgur.com/HeIi0wU.png";
 
       if(!isMe && m.time > lastMsgTime && document.hidden) {
-        new Notification(user.username, { body: m.text, icon: photo });
+        try {
+          new Notification(user.username, { body: m.text, icon: photo });
+        } catch(e) {}
       }
       lastMsgTime = m.time;
 
       html += `
       <div class="msgRow ${isMe ? 'me' : 'other'}">
-        ${!isMe ? `<img src="${photo}" class="avatar" onclick="showProfile('${m.uid}')">` : ''}
-        <div>
+        ${!isMe ? `<img src="${photo}" class="avatar" onclick="showProfile('${m.uid}')" onerror="this.src='https://i.imgur.com/HeIi0wU.png'">` : ''}
+        <div class="msg-content-wrapper">
           <div class="msg">${escapeHtml(m.text)}</div>
           <div class="msg-actions">
             ${isMe ? `<button class="delete-btn" onclick="delMsg('${m.id}')">🗑</button>` : ''}
             ${!isMe ? ratingUI(m.uid) : ''}
           </div>
         </div>
-        ${isMe ? `<img src="${photo}" class="avatar" onclick="showProfile('${m.uid}')">` : ''}
+        ${isMe ? `<img src="${photo}" class="avatar" onclick="showProfile('${m.uid}')" onerror="this.src='https://i.imgur.com/HeIi0wU.png'">` : ''}
       </div>`;
     });
 
@@ -1148,7 +1292,7 @@ function loadMsgs() {
   });
 
   // Listen for typing updates
-  onSnapshot(collection(db, 'users'), snap => {
+  usersUnsub = onSnapshot(collection(db, 'users'), snap => {
     let typingUser = null;
     snap.forEach(d => {
       let data = d.data();
@@ -1176,6 +1320,7 @@ function loadMsgs() {
 }
 
 function escapeHtml(text) {
+  if(!text) return '';
   let div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
@@ -1187,12 +1332,11 @@ function ratingUI(uid) {
   let stars = [1,2,3,4,5].map(s => 
     `<button class="rate-btn ${rated >= s ? 'rated' : ''}" 
       onclick="rateUser('${uid}', ${s})" 
-      ${rated > 0 ? 'disabled' : ''}
-      style="${rated > 0 ? 'cursor:not-allowed' : ''}">⭐</button>`
+      ${rated > 0 ? 'disabled' : ''}>⭐</button>`
   ).join('');
   
   if(rated > 0) {
-    stars += ' <span style="font-size:9px;color:#888">(Done)</span>';
+    stars += `<span class="rated-label">Done</span>`;
   }
   return `<div style="display:flex;align-items:center;gap:2px">${stars}</div>`;
 }
@@ -1235,6 +1379,7 @@ window.showProfile = (id) => {
   document.getElementById('pName').innerText = u.username;
   document.getElementById('pBio').innerText = u.bio || 'Tidak ada bio';
   document.getElementById('pImg').src = u.photo || "https://i.imgur.com/HeIi0wU.png";
+  document.getElementById('pImg').onerror = function() { this.src = 'https://i.imgur.com/HeIi0wU.png'; };
   document.getElementById('pRating').innerText = `Rating: ⭐ ${(u.rating || 0).toFixed(1)} (${u.totalRate || 0} votes)`;
   document.getElementById('profilePopup').style.display = 'block';
   document.getElementById('popupOverlay').style.display = 'block';
@@ -1262,6 +1407,25 @@ async function setOnlineStatus(status) {
 window.addEventListener('beforeunload', () => setOnlineStatus(false));
 window.addEventListener('focus', () => { if(me) setOnlineStatus(true); });
 window.addEventListener('blur', () => { if(me) setOnlineStatus(false); });
+
+// Pastikan input area tetap terlihat saat keyboard muncul di mobile
+window.addEventListener('resize', () => {
+  let inputArea = document.getElementById('chatInputArea');
+  if(inputArea && document.activeElement === document.getElementById('msgInput')) {
+    setTimeout(() => {
+      inputArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 100);
+  }
+});
+
+// Fix untuk iOS keyboard
+document.addEventListener('focusin', (e) => {
+  if(e.target.id === 'msgInput') {
+    setTimeout(() => {
+      document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    }, 300);
+  }
+});
 
 </script>
 </body>
