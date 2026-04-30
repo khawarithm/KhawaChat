@@ -1,217 +1,1144 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhawaChat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KhawaChat - Chat Modern</title>
 <style>
-body{margin:0;font-family:Arial;background:#0a0a0a;color:white}
-.container{display:flex;height:100vh}
-.sidebar{width:30%;background:#111;padding:10px;overflow:auto}
-.chat{flex:1;display:flex;flex-direction:column}
-.messages{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column}
-input,button{padding:10px;border:none;border-radius:8px;margin:5px 0}
-button{background:white;color:black;cursor:pointer}
-.msgRow{display:flex;margin:5px 0}
-.msgRow.me{justify-content:flex-end}
-.msgRow.other{justify-content:flex-start}
-.msg{padding:10px;border-radius:10px;max-width:60%}
-.me .msg{background:white;color:black}
-.other .msg{background:#222}
-.avatar{width:25px;height:25px;border-radius:50%;margin:0 5px;cursor:pointer}
-.user{background:#1a1a1a;padding:8px;margin:5px;border-radius:8px;cursor:pointer}
-.delete{font-size:10px;color:red;cursor:pointer}
-.online{color:lime;font-size:10px}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  color: white;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* LOGIN PAGE */
+#authPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.auth-card {
+  background: rgba(24, 24, 36, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-card h2 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-card .subtitle {
+  text-align: center;
+  color: #999;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 14px 18px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  transition: all 0.3s;
+  outline: none;
+}
+
+.auth-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.auth-input::placeholder {
+  color: #666;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* PROFILE SETUP */
+#profileSetup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.profile-card {
+  background: rgba(24, 24, 36, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+.profile-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.file-upload {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: #999;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.file-upload:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+/* MAIN APP */
+#app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 100vh;
+  background: rgba(14, 14, 24, 0.98);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 100;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header h3 {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-bar {
+  margin: 15px 0;
+  display: flex;
+  gap: 8px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.search-bar input:focus {
+  border-color: #667eea;
+}
+
+.search-bar button {
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#users {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.user-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 6px 0;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-card:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.user-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-card-info {
+  flex: 1;
+}
+
+.user-card-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-card-status {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.online {
+  background: #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.status-dot.typing {
+  background: #ffaa00;
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+  animation: pulse 1s infinite;
+}
+
+.status-dot.offline {
+  background: #555;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.user-card-rating {
+  font-size: 12px;
+  color: #ffaa00;
+}
+
+.edit-profile-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+
+.edit-profile-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 99;
+  display: none;
+}
+
+.sidebar-overlay.show {
+  display: block;
+}
+
+/* CHAT AREA */
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: rgba(10, 10, 20, 0.8);
+}
+
+.chat-header {
+  padding: 15px 20px;
+  background: rgba(14, 14, 24, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(20px);
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.global-badge {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.msgRow {
+  display: flex;
+  gap: 8px;
+  animation: fadeInUp 0.3s ease;
+}
+
+.msgRow.me {
+  justify-content: flex-end;
+}
+
+.msgRow.other {
+  justify-content: flex-start;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.avatar:hover {
+  border-color: #667eea;
+  transform: scale(1.1);
+}
+
+.msg {
+  padding: 10px 14px;
+  border-radius: 16px;
+  max-width: 65%;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+}
+
+.me .msg {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.other .msg {
+  background: rgba(40, 40, 60, 0.8);
+  color: white;
+  border-bottom-left-radius: 4px;
+}
+
+.msg-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 100, 100, 0.7);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.delete-btn:hover {
+  color: #ff4444;
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.rate-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  transition: all 0.2s;
+  opacity: 0.6;
+}
+
+.rate-btn:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.rate-btn.rated {
+  opacity: 1;
+  filter: none;
+}
+
+.chat-input-area {
+  padding: 15px 20px;
+  background: rgba(14, 14, 24, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.chat-input-area input:focus {
+  border-color: #667eea;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.send-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.send-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.typing-indicator {
+  padding: 5px 20px;
+  font-size: 12px;
+  color: #ffaa00;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.typing-dots span {
+  width: 5px;
+  height: 5px;
+  background: #ffaa00;
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* PROFILE POPUP */
+#profilePopup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(24, 24, 36, 0.98);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 30px;
+  z-index: 200;
+  min-width: 300px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+}
+
+#profilePopup img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 15px;
+}
+
+#profilePopup h3 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+#profilePopup p {
+  color: #999;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.profile-close-btn {
+  padding: 10px 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.profile-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 199;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .msg {
+    max-width: 80%;
+    font-size: 13px;
+  }
+
+  .chat-input-area {
+    padding: 10px;
+  }
+
+  .auth-card, .profile-card {
+    margin: 10px;
+  }
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
 </style>
 </head>
-<body><div id="authPage">
-<h2>Login</h2>
-<input id="email"><br>
-<input id="password" type="password"><br>
-<button onclick="login()">Login</button>
-<button onclick="register()">Register</button>
-</div><div id="profileSetup" style="display:none">
-<h2>Profile</h2>
-<input id="username" placeholder="Username"><br>
-<input id="bio" placeholder="Bio"><br>
-<input type="file" id="photoFile"><br>
-<button onclick="saveProfile()">Save</button>
-</div><div id="app" style="display:none">
-<div class="container">
-<div class="sidebar">
-<h3>Users</h3>
-<button onclick="editProfile()">Edit Profile</button>
-<div id="users"></div>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="authPage">
+  <div class="auth-card">
+    <h2>⚡ KhawaChat</h2>
+    <p class="subtitle">Chat Modern & Aman</p>
+    <input class="auth-input" id="email" placeholder="Email" type="email" autocomplete="email">
+    <input class="auth-input" id="password" placeholder="Password" type="password" autocomplete="current-password">
+    <button class="auth-btn btn-primary" onclick="login()">🚀 Login</button>
+    <button class="auth-btn btn-secondary" onclick="register()">📝 Register</button>
+  </div>
 </div>
-<div class="chat">
-<div id="messages" class="messages"></div>
-<input id="msgInput" placeholder="Ketik pesan" oninput="typing()">
-<button onclick="sendMsg()">Send</button>
-<div id="typingStatus"></div>
+
+<!-- PROFILE SETUP -->
+<div id="profileSetup" style="display:none">
+  <div class="profile-card">
+    <h2>🎨 Setup Profile</h2>
+    <input class="auth-input" id="username" placeholder="Username kerenmu">
+    <input class="auth-input" id="bio" placeholder="Bio singkat">
+    <label class="file-upload">
+      📸 Pilih Foto Profile
+      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="this.parentElement.textContent=this.files[0]?.name||'Pilih Foto'">
+    </label>
+    <button class="auth-btn btn-primary" onclick="saveProfile()" style="margin-top:15px">💾 Simpan Profile</button>
+  </div>
 </div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <div class="container">
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>💬 Pengguna</h3>
+        <div class="search-bar">
+          <input id="searchInput" placeholder="🔍 Cari pengguna..." oninput="searchUsers()">
+          <button onclick="searchUsers()">Cari</button>
+        </div>
+        <button class="edit-profile-btn" onclick="editProfile()">✏️ Edit Profile</button>
+      </div>
+      <div id="users"></div>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div class="chat">
+      <div class="chat-header">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <span id="chatTitle">🌍 Global Chat</span>
+        <span class="global-badge" id="chatBadge">Global</span>
+      </div>
+      <div class="messages" id="messages"></div>
+      <div class="typing-indicator" id="typingArea" style="display:none">
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span id="typingText"></span>
+      </div>
+      <div class="chat-input-area">
+        <input id="msgInput" placeholder="Ketik pesan..." oninput="handleTyping()" onkeypress="if(event.key==='Enter')sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+  </div>
 </div>
-</div><div id="profilePopup" style="display:none;position:fixed;top:20%;left:50%;transform:translateX(-50%);background:#111;padding:20px;border-radius:10px">
-<h3 id="pName"></h3>
-<p id="pBio"></p>
-<img id="pImg" width="80"><br>
-<button onclick="closeProfile()">Close</button>
-</div><script type="module">
+
+<!-- PROFILE POPUP -->
+<div class="popup-overlay" id="popupOverlay" onclick="closeProfile()"></div>
+<div id="profilePopup">
+  <img id="pImg" src="https://i.imgur.com/HeIi0wU.png">
+  <h3 id="pName"></h3>
+  <p id="pBio"></p>
+  <p id="pRating"></p>
+  <button class="profile-close-btn" onclick="closeProfile()">Tutup</button>
+</div>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, getDocs, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const appFirebase = initializeApp({
-apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
-authDomain:"crowdedparty.firebaseapp.com",
-projectId:"crowdedparty"
+  apiKey:"AIzaSyDxfd_zWhV70QL97ea7a6W4W_BlySxtKLw",
+  authDomain:"crowdedparty.firebaseapp.com",
+  projectId:"crowdedparty"
 });
 
 const auth = getAuth(appFirebase);
 const db = getFirestore(appFirebase);
 
-let me=null,chat='global',usersCache={},lastSend=0,lastMsgTime=0;
+let me = null;
+let currentChat = 'global';
+let usersCache = {};
+let lastSend = 0;
+let lastMsgTime = 0;
+let typingTimers = {};
+let myRatings = {};
+let sidebarOpen = false;
 
 Notification.requestPermission();
 
-window.login=()=>signInWithEmailAndPassword(auth,email.value,password.value);
-window.register=()=>createUserWithEmailAndPassword(auth,email.value,password.value);
+// AUTH
+window.login = () => signInWithEmailAndPassword(auth, email.value, password.value);
+window.register = () => createUserWithEmailAndPassword(auth, email.value, password.value);
 
-onAuthStateChanged(auth,async u=>{
-if(!u) return;
-me=u;
-authPage.style.display='none';
+onAuthStateChanged(auth, async u => {
+  if(!u) return;
+  me = u;
+  authPage.style.display = 'none';
 
-let snap=await getDoc(doc(db,'users',u.uid));
-if(!snap.exists()) profileSetup.style.display='block';
-else{app.style.display='block';init();}
+  let snap = await getDoc(doc(db, 'users', u.uid));
+  if(!snap.exists()) {
+    profileSetup.style.display = 'flex';
+    profileSetup.style.justifyContent = 'center';
+    profileSetup.style.alignItems = 'center';
+  } else {
+    app.style.display = 'flex';
+    init();
+  }
 });
 
-function fileToBase64(f){return new Promise(r=>{let rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(f);});}
-
-window.saveProfile=async()=>{
-let file=photoFile.files[0];
-let photo=file?await fileToBase64(file):"";
-await setDoc(doc(db,'users',me.uid),{username:username.value,bio:bio.value,photo:photo,rating:0,totalRate:0,online:true});
-profileSetup.style.display='none';app.style.display='block';init();
+// HELPERS
+function fileToBase64(f) {
+  return new Promise(r => {
+    let rd = new FileReader();
+    rd.onload = () => r(rd.result);
+    rd.readAsDataURL(f);
+  });
 }
 
-window.editProfile=async()=>{
-let snap=await getDoc(doc(db,'users',me.uid));
-let d=snap.data();
-let name=prompt('Username',d.username);
-let bioo=prompt('Bio',d.bio);
-await updateDoc(doc(db,'users',me.uid),{username:name,bio:bioo});
-loadUsers();
+// PROFILE
+window.saveProfile = async () => {
+  if(!username.value.trim()) return alert('Username wajib diisi!');
+  let file = photoFile.files[0];
+  let photo = file ? await fileToBase64(file) : "";
+  await setDoc(doc(db, 'users', me.uid), {
+    username: username.value.trim(),
+    bio: bio.value.trim(),
+    photo: photo,
+    rating: 0,
+    totalRate: 0,
+    online: true,
+    typing: false,
+    typingTo: ''
+  });
+  profileSetup.style.display = 'none';
+  app.style.display = 'flex';
+  init();
+};
+
+window.editProfile = async () => {
+  let snap = await getDoc(doc(db, 'users', me.uid));
+  let d = snap.data();
+  let name = prompt('Username baru:', d.username);
+  if(!name) return;
+  let bioo = prompt('Bio baru:', d.bio);
+  if(bioo === null) return;
+  await updateDoc(doc(db, 'users', me.uid), {
+    username: name.trim(),
+    bio: bioo.trim()
+  });
+  await loadUsers();
+  toggleSidebar();
+};
+
+// INIT
+async function init() {
+  await loadMyRatings();
+  await loadUsers();
+  loadMsgs();
 }
 
-async function init(){await loadUsers();loadMsgs();}
-
-async function loadUsers(){
-let snap=await getDocs(collection(db,'users'));
-let html="";usersCache={};
-
-snap.forEach(d=>{
-let data=d.data();
-usersCache[d.id]=data;
-html+=`<div class='user' onclick="openChat('${d.id}')">
-${data.username} ⭐${(data.rating||0).toFixed(1)}
-<div class='online'>${data.online?'online':'offline'}</div>
-</div>`;
-});
-
-users.innerHTML=html;
+async function loadMyRatings() {
+  let snap = await getDoc(doc(db, 'ratings', me.uid));
+  if(snap.exists()) myRatings = snap.data();
 }
 
-window.openChat=id=>{chat=id;loadMsgs();}
+// SIDEBAR
+window.toggleSidebar = () => {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+  document.getElementById('sidebarOverlay').classList.toggle('show', sidebarOpen);
+};
 
-window.sendMsg=async()=>{
-if(!msgInput.value) return;
-let now=Date.now();
-if(chat==='global' && now-lastSend<12000){alert('Cooldown 12 detik');return}
-lastSend=now;
+// LOAD USERS
+async function loadUsers(searchTerm = '') {
+  let snap = await getDocs(collection(db, 'users'));
+  let users = [];
+  usersCache = {};
 
-await addDoc(collection(db,'messages'),{
-text:msgInput.value,
-uid:me.uid,
-to:chat,
-time:now
-});
+  snap.forEach(d => {
+    let data = d.data();
+    usersCache[d.id] = data;
+    users.push({ id: d.id, ...data });
+  });
 
-msgInput.value="";
+  // Filter & sort
+  if(searchTerm) {
+    users = users.filter(u => 
+      u.username.toLowerCase().includes(searchTerm.toLowerCase()) && 
+      u.id !== me.uid
+    );
+    // Sort by rating, online first
+    users.sort((a, b) => {
+      if(a.online && !b.online) return -1;
+      if(!a.online && b.online) return 1;
+      return (b.rating || 0) - (a.rating || 0);
+    });
+  } else {
+    users = users.filter(u => u.id !== me.uid);
+    users.sort((a, b) => {
+      if(a.online && !b.online) return -1;
+      if(!a.online && b.online) return 1;
+      return (b.rating || 0) - (a.rating || 0);
+    });
+  }
+
+  let html = '';
+  users.forEach(u => {
+    let statusClass = 'offline';
+    let statusText = 'Offline';
+    if(u.online) {
+      if(u.typing && u.typingTo === me.uid) {
+        statusClass = 'typing';
+        statusText = 'Mengetik...';
+      } else {
+        statusClass = 'online';
+        statusText = 'Online';
+      }
+    }
+
+    html += `
+    <div class="user-card" onclick="openChat('${u.id}')">
+      <img class="user-card-avatar" src="${u.photo || 'https://i.imgur.com/HeIi0wU.png'}">
+      <div class="user-card-info">
+        <div class="user-card-name">${u.username}</div>
+        <div class="user-card-status">
+          <span class="status-dot ${statusClass}"></span>
+          ${statusText}
+        </div>
+      </div>
+      <div class="user-card-rating">⭐ ${(u.rating || 0).toFixed(1)}</div>
+    </div>`;
+  });
+
+  document.getElementById('users').innerHTML = html || '<p style="text-align:center;color:#666;margin-top:20px">Tidak ada pengguna</p>';
 }
 
-function loadMsgs(){
-onSnapshot(collection(db,'messages'),snap=>{
-let arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));
-arr.sort((a,b)=>a.time-b.time);
+window.searchUsers = () => {
+  let term = document.getElementById('searchInput').value.trim();
+  loadUsers(term);
+};
 
-let html="";
-arr.forEach(m=>{
-if(!usersCache[m.uid]) return;
-if(chat==='global' && m.to!=='global') return;
-if(chat!=='global' && !(m.uid===me.uid&&m.to===chat||m.uid===chat&&m.to===me.uid)) return;
+// OPEN CHAT
+window.openChat = (id) => {
+  currentChat = id;
+  let user = usersCache[id];
+  if(user) {
+    document.getElementById('chatTitle').textContent = `💬 ${user.username}`;
+    document.getElementById('chatBadge').textContent = 'Private';
+    document.getElementById('chatBadge').style.background = 'linear-gradient(135deg, #00c853, #69f0ae)';
+  }
+  loadMsgs();
+  toggleSidebar();
+};
 
-let isMe=m.uid===me.uid;
-let user=usersCache[m.uid];
-let photo=user.photo||"https://i.imgur.com/HeIi0wU.png";
+// Switch to global
+document.getElementById('chatTitle').onclick = () => {
+  currentChat = 'global';
+  document.getElementById('chatTitle').textContent = '🌍 Global Chat';
+  document.getElementById('chatBadge').textContent = 'Global';
+  document.getElementById('chatBadge').style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+  loadMsgs();
+};
 
-if(!isMe && m.time>lastMsgTime && document.hidden){
-new Notification(user.username,{body:m.text});
+// SEND MESSAGE
+window.sendMsg = async () => {
+  let text = msgInput.value.trim();
+  if(!text) return;
+
+  let now = Date.now();
+  if(currentChat === 'global' && now - lastSend < 12000) {
+    alert('⏳ Cooldown 12 detik untuk global chat');
+    return;
+  }
+  lastSend = now;
+
+  await addDoc(collection(db, 'messages'), {
+    text: text,
+    uid: me.uid,
+    to: currentChat,
+    time: now
+  });
+
+  msgInput.value = '';
+  
+  // Update my typing status to false
+  await updateDoc(doc(db, 'users', me.uid), { typing: false, typingTo: '' });
+};
+
+// TYPING
+window.handleTyping = async () => {
+  if(currentChat === 'global') return;
+
+  await updateDoc(doc(db, 'users', me.uid), { 
+    typing: true, 
+    typingTo: currentChat 
+  });
+
+  clearTimeout(typingTimers[currentChat]);
+  typingTimers[currentChat] = setTimeout(async () => {
+    await updateDoc(doc(db, 'users', me.uid), { 
+      typing: false, 
+      typingTo: '' 
+    });
+  }, 2000);
+};
+
+// LOAD MESSAGES
+function loadMsgs() {
+  onSnapshot(collection(db, 'messages'), snap => {
+    let arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+    arr.sort((a, b) => a.time - b.time);
+
+    let html = '';
+    arr.forEach(m => {
+      if(!usersCache[m.uid]) return;
+      if(currentChat === 'global' && m.to !== 'global') return;
+      if(currentChat !== 'global' && !(
+        (m.uid === me.uid && m.to === currentChat) || 
+        (m.uid === currentChat && m.to === me.uid)
+      )) return;
+
+      let isMe = m.uid === me.uid;
+      let user = usersCache[m.uid];
+      let photo = user.photo || "https://i.imgur.com/HeIi0wU.png";
+
+      if(!isMe && m.time > lastMsgTime && document.hidden) {
+        new Notification(user.username, { body: m.text, icon: photo });
+      }
+      lastMsgTime = m.time;
+
+      html += `
+      <div class="msgRow ${isMe ? 'me' : 'other'}">
+        ${!isMe ? `<img src="${photo}" class="avatar" onclick="showProfile('${m.uid}')">` : ''}
+        <div>
+          <div class="msg">${m.text}</div>
+          <div class="msg-actions">
+            ${isMe ? `<button class="delete-btn" onclick="delMsg('${m.id}')">🗑 Hapus</button>` : ''}
+            ${!isMe ? ratingUI(m.uid) : ''}
+          </div>
+        </div>
+        ${isMe ? `<img src="${photo}" class="avatar" onclick="showProfile('${m.uid}')">` : ''}
+      </div>`;
+    });
+
+    document.getElementById('messages').innerHTML = html;
+    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+  });
+
+  // Listen for typing updates
+  onSnapshot(collection(db, 'users'), snap => {
+    let typingUser = null;
+    snap.forEach(d => {
+      let data = d.data();
+      usersCache[d.id] = data;
+      if(d.id === currentChat && data.typing && data.typingTo === me.uid) {
+        typingUser = data.username;
+      }
+    });
+
+    let typingArea = document.getElementById('typingArea');
+    let typingText = document.getElementById('typingText');
+    if(typingUser) {
+      typingArea.style.display = 'flex';
+      typingText.textContent = `${typingUser} sedang mengetik...`;
+    } else {
+      typingArea.style.display = 'none';
+    }
+
+    // Also refresh users list periodically
+    if(sidebarOpen) loadUsers();
+  });
 }
-lastMsgTime=m.time;
 
-html+=`<div class='msgRow ${isMe?'me':'other'}'>
-${!isMe?`<img src='${photo}' class='avatar' onclick="showProfile('${m.uid}')">`:''}
-<div>
-<div class='msg'>${m.text}</div>
-${isMe?`<div class='delete' onclick="delMsg('${m.id}')">hapus</div>`:''}
-${!isMe?ratingUI(m.uid):''}
-</div>
-${isMe?`<img src='${photo}' class='avatar' onclick="showProfile('${m.uid}')">`:''}
-</div>`;
-});
-
-messages.innerHTML=html;
-messages.scrollTop=messages.scrollHeight;
-});
+// RATING SYSTEM
+function ratingUI(uid) {
+  let rated = myRatings[uid] || 0;
+  let stars = [1,2,3,4,5].map(s => 
+    `<button class="rate-btn ${rated >= s ? 'rated' : ''}" 
+      onclick="rateUser('${uid}', ${s})" 
+      ${rated > 0 ? 'disabled' : ''}>⭐</button>`
+  ).join('');
+  
+  if(rated > 0) {
+    stars += ' <span style="font-size:10px;color:#888">(Sudah dirate)</span>';
+  }
+  return stars;
 }
 
-function ratingUI(uid){
-return `<div>${[1,2,3,4,5].map(s=>`<span onclick="rateUser('${uid}',${s})">⭐</span>`).join('')}</div>`;
+window.rateUser = async (uid, star) => {
+  if(myRatings[uid]) {
+    alert('Kamu sudah memberikan rating ke pengguna ini!');
+    return;
+  }
+
+  let ref = doc(db, 'users', uid);
+  let snap = await getDoc(ref);
+  let d = snap.data();
+
+  let total = (d.totalRate || 0) + 1;
+  let rating = (((d.rating || 0) * (d.totalRate || 0)) + star) / total;
+
+  await updateDoc(ref, { rating, totalRate: total });
+
+  // Save my rating
+  myRatings[uid] = star;
+  await setDoc(doc(db, 'ratings', me.uid), myRatings);
+
+  alert('✅ Rating berhasil diberikan!');
+  loadMsgs();
+};
+
+// DELETE MESSAGE
+window.delMsg = async (id) => {
+  if(!confirm('Hapus pesan ini?')) return;
+  await updateDoc(doc(db, 'messages', id), { text: '[pesan dihapus]' });
+};
+
+// PROFILE POPUP
+window.showProfile = (id) => {
+  let u = usersCache[id];
+  if(!u) return;
+  document.getElementById('pName').innerText = u.username;
+  document.getElementById('pBio').innerText = u.bio || 'Tidak ada bio';
+  document.getElementById('pImg').src = u.photo || "https://i.imgur.com/HeIi0wU.png";
+  document.getElementById('pRating').innerText = `Rating: ⭐ ${(u.rating || 0).toFixed(1)} (${u.totalRate || 0} votes)`;
+  document.getElementById('profilePopup').style.display = 'block';
+  document.getElementById('popupOverlay').style.display = 'block';
+};
+
+window.closeProfile = () => {
+  document.getElementById('profilePopup').style.display = 'none';
+  document.getElementById('popupOverlay').style.display = 'none';
+};
+
+// ONLINE STATUS
+async function setOnlineStatus(status) {
+  if(!me) return;
+  await updateDoc(doc(db, 'users', me.uid), { 
+    online: status,
+    typing: false,
+    typingTo: ''
+  });
 }
 
-window.rateUser=async(uid,star)=>{
-let ref=doc(db,'users',uid);
-let snap=await getDoc(ref);
-let d=snap.data();
+window.addEventListener('beforeunload', () => setOnlineStatus(false));
+window.addEventListener('focus', () => setOnlineStatus(true));
+window.addEventListener('blur', () => setOnlineStatus(false));
 
-let total=d.totalRate||0;
-let rating=d.rating||0;
+// Initial online status
+setOnlineStatus(true);
 
-let newTotal=total+1;
-let newRating=((rating*total)+star)/newTotal;
-
-await updateDoc(ref,{rating:newRating,totalRate:newTotal});
-alert('Rated!');
-}
-
-window.delMsg=async(id)=>{
-await updateDoc(doc(db,'messages',id),{text:'[pesan dihapus]'});
-}
-
-window.showProfile=id=>{
-let u=usersCache[id];
-pName.innerText=u.username;
-pBio.innerText=u.bio||'';
-pImg.src=u.photo||"https://i.imgur.com/HeIi0wU.png";
-profilePopup.style.display='block';
-}
-
-window.closeProfile=()=>profilePopup.style.display='none';
-
-window.typing=()=>{
-typingStatus.innerText='Mengetik...';
-setTimeout(()=>typingStatus.innerText='',1000);
-}
-
-</script></body>
+</script>
+</body>
 </html>
