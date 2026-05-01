@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AxChat - Modern Chat App</title>
+    <title>AxChat</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="AxChat">
+    <meta name="apple-mobile-web-app-title" content="AxChat">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a14">
+    <meta name="description" content="AxChat - Modern Chat App">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -43,7 +62,7 @@
             <h2>🎨 Setup Profile</h2>
             <div class="profile-preview-container">
                 <img id="setupPreviewImg" src="https://i.imgur.com/HeIi0wU.png" class="profile-preview-img" alt="Preview">
-                <label for="setupPhotoInput" class="change-photo-btn" id="setupPhotoLabel">📸 Pilih Foto</label>
+                <label for="setupPhotoInput" class="change-photo-btn">📸 Pilih Foto</label>
                 <input type="file" id="setupPhotoInput" accept="image/*" style="display:none">
             </div>
             <div class="input-group">
@@ -140,7 +159,7 @@
             <h3>✏️ Edit Profile</h3>
             <div class="profile-preview-container">
                 <img id="editPreviewImg" src="https://i.imgur.com/HeIi0wU.png" class="profile-preview-img" alt="Preview">
-                <label for="editPhotoInput" class="change-photo-btn" id="editPhotoLabel">📸 Ganti Foto</label>
+                <label for="editPhotoInput" class="change-photo-btn">📸 Ganti Foto</label>
                 <input type="file" id="editPhotoInput" accept="image/*" style="display:none">
             </div>
             <div class="input-group">
@@ -156,6 +175,12 @@
         </div>
     </div>
 
+    <!-- PWA Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <button class="install-btn" id="installBtn">📲 Tambahkan ke Halaman Utama</button>
+        <button class="install-close-btn" id="installCloseBtn">✕</button>
+    </div>
+
     <script type="module" src="script.js"></script>
 </body>
-</html>
+    </html>
