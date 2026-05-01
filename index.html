@@ -77,16 +77,18 @@
                     <button class="logout-btn" id="btnLogout">🚪 Log Out</button>
                 </div>
             </div>
+            <!-- CHAT INPUT AREA (WHATSAPP STYLE) - FIXED -->
+<div class="chat-input-container">
+    <div class="chat-input-area">
+        <div class="input-wrapper">
+            <textarea id="msgInput" placeholder="Ketik pesan..." rows="1" autocomplete="off"></textarea>
+        </div>
+        <button class="send-btn" id="btnSend">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+    </div>
+</div>
 
-            <!-- CHAT AREA -->
-            <div class="chat" id="chatContainer">
-                <div class="chat-header">
-                    <button class="menu-toggle" id="btnMenuToggle">☰</button>
-                    <div class="chat-header-info" id="chatHeaderInfo">
-                        <div class="chat-header-title" id="chatTitle">🌍 Global Chat</div>
-                        <span class="global-badge" id="chatBadge">Global</span>
-                    </div>
-                </div>
 
                 <div class="messages" id="messages"></div>
 
