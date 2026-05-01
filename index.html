@@ -17,7 +17,7 @@
         <div class="bg-grid"></div>
     </div>
 
-    <!-- LOGIN PAGE -->
+    <!-- ============ LOGIN PAGE ============ -->
     <div id="authPage">
         <div class="auth-card">
             <div class="auth-logo">💬</div>
@@ -37,41 +37,39 @@
         </div>
     </div>
 
-    <!-- PROFILE SETUP -->
+    <!-- ============ PROFILE SETUP ============ -->
     <div id="profileSetup">
         <div class="profile-card">
             <h2>🎨 Setup Profile</h2>
+            <div class="profile-preview-container">
+                <img id="setupPreviewImg" src="https://i.imgur.com/HeIi0wU.png" class="profile-preview-img" alt="Preview">
+                <label for="setupPhotoInput" class="change-photo-btn" id="setupPhotoLabel">📸 Pilih Foto</label>
+                <input type="file" id="setupPhotoInput" accept="image/*" style="display:none">
+            </div>
             <div class="input-group">
                 <span class="input-icon">👤</span>
-                <input class="auth-input" id="username" placeholder="Username kerenmu" maxlength="20">
+                <input class="auth-input" id="setupUsername" placeholder="Username kerenmu" maxlength="20">
             </div>
             <div class="input-group">
                 <span class="input-icon">📝</span>
-                <input class="auth-input" id="bio" placeholder="Bio singkat" maxlength="100">
+                <input class="auth-input" id="setupBio" placeholder="Bio singkat" maxlength="100">
             </div>
-            <label class="file-upload" id="fileLabel">
-                📸 Pilih Foto Profile
-                <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="document.getElementById('fileLabel').childNodes[0].textContent=this.files[0]?.name||'📸 Pilih Foto Profile'">
-            </label>
-            <button class="auth-btn btn-primary" id="btnSaveProfile" style="margin-top:15px">💾 Simpan Profile</button>
+            <button class="auth-btn btn-primary" id="btnSaveSetupProfile">💾 Simpan Profile</button>
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- ============ MAIN APP ============ -->
     <div id="app">
         <div class="container">
             <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            <!-- SIDEBAR -->
+            <!-- SIDEBAR 2 TAB -->
             <div class="sidebar" id="sidebar">
-                <div class="sidebar-header">
-                    <h3>💬 Pengguna</h3>
-                    <div class="search-bar">
-                        <input id="searchInput" placeholder="🔍 Cari...">
-                        <button id="btnSearch">Cari</button>
-                    </div>
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab active" data-tab="chats">💬 Chats</button>
+                    <button class="sidebar-tab" data-tab="users">👥 Users</button>
                 </div>
-                <div id="users"></div>
+                <div class="sidebar-content" id="sidebarContent"></div>
                 <div class="sidebar-buttons">
                     <button class="edit-profile-btn" id="btnEditProfile">✏️ Edit Profile</button>
                     <button class="logout-btn" id="btnLogout">🚪 Log Out</button>
@@ -97,7 +95,7 @@
                     <span id="typingText"></span>
                 </div>
 
-                <!-- CHAT INPUT - FIXED & SOLID -->
+                <!-- CHAT INPUT -->
                 <div class="chat-input-container">
                     <div class="chat-input-area">
                         <div class="input-wrapper">
@@ -112,43 +110,44 @@
         </div>
     </div>
 
-    <!-- PROFILE POPUP -->
+    <!-- ============ PROFILE POPUP ============ -->
     <div class="popup-overlay" id="popupOverlay"></div>
     <div id="profilePopup">
-        <img id="pImg" src="https://i.imgur.com/HeIi0wU.png">
+        <img id="pImg" src="https://i.imgur.com/HeIi0wU.png" alt="Foto">
         <h3 id="pName"></h3>
         <p id="pBio"></p>
         <p id="pRating"></p>
         <button class="profile-close-btn" id="btnCloseProfile">Tutup</button>
     </div>
 
-    <!-- CUSTOM MODAL -->
+    <!-- ============ CUSTOM MODAL ============ -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <p id="modalMessage"></p>
-            <div class="modal-buttons" id="modalButtons">
+            <div class="modal-buttons">
                 <button class="modal-btn modal-btn-cancel" id="modalCancel">Batal</button>
                 <button class="modal-btn modal-btn-ok" id="modalOk">OK</button>
             </div>
         </div>
     </div>
 
-    <!-- TOAST -->
+    <!-- ============ TOAST ============ -->
     <div class="toast" id="toast"></div>
 
-    <!-- EDIT PROFILE MODAL -->
-    <div class="modal-overlay" id="editProfileModal">
-        <div class="modal-box">
+    <!-- ============ EDIT PROFILE MODAL ============ -->
+    <div class="modal-overlay" id="editProfileOverlay">
+        <div class="modal-box edit-profile-modal">
             <h3>✏️ Edit Profile</h3>
-            <div class="input-group">
-                <input class="auth-input" id="editUsername" placeholder="Username">
+            <div class="profile-preview-container">
+                <img id="editPreviewImg" src="https://i.imgur.com/HeIi0wU.png" class="profile-preview-img" alt="Preview">
+                <label for="editPhotoInput" class="change-photo-btn" id="editPhotoLabel">📸 Ganti Foto</label>
+                <input type="file" id="editPhotoInput" accept="image/*" style="display:none">
             </div>
             <div class="input-group">
-                <input class="auth-input" id="editBio" placeholder="Bio">
+                <input class="auth-input" id="editUsernameInput" placeholder="Username">
             </div>
-            <div class="file-upload" id="editFileLabel">
-                📸 Ganti Foto Profile
-                <input type="file" id="editPhotoFile" accept="image/*" style="display:none">
+            <div class="input-group">
+                <input class="auth-input" id="editBioInput" placeholder="Bio">
             </div>
             <div class="modal-buttons" style="margin-top:15px">
                 <button class="modal-btn modal-btn-cancel" id="cancelEditProfile">Batal</button>
